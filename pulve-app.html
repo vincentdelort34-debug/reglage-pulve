@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PulvéRéglage</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#f5f0e8; --card:#fff; --brown:#3d2b1f; --brown-mid:#7a5c46;
+  --brown-light:#c4a882; --green:#4a7c3f; --green-pale:#e8f2e5;
+  --orange:#c8621a; --orange-pale:#fdf0e6; --yellow:#d4a017;
+  --yellow-pale:#fdf7e3; --red:#b53a2a; --red-pale:#fdecea;
+  --border:#e0d5c5; --shadow:rgba(61,43,31,.08); --shadow-md:rgba(61,43,31,.15);
+  --text:#2c1f14; --muted:#9c8370;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--cream);background-image:radial-gradient(ellipse at 20% 0%,rgba(200,165,110,.15) 0%,transparent 55%),radial-gradient(ellipse at 80% 100%,rgba(74,124,63,.07) 0%,transparent 55%);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding:20px 14px 60px;}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:10px;}
+.logo-block{display:flex;align-items:center;gap:12px;}
+.logo-mark{width:44px;height:44px;background:var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 3px 10px rgba(74,124,63,.28);}
+.logo-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--brown);}
+.logo-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.live-chip{display:flex;align-items:center;gap:5px;background:var(--green-pale);border:1px solid rgba(74,124,63,.2);border-radius:20px;padding:4px 11px;font-size:11px;color:var(--green);font-weight:600;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.clock{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
+
+/* STEP NAV */
+.step-nav{display:flex;align-items:center;gap:0;margin-bottom:24px;background:var(--card);border-radius:14px;box-shadow:0 2px 10px var(--shadow),0 0 0 1px var(--border);overflow:hidden;}
+.step{flex:1;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;border-right:1px solid var(--border);}
+.step:last-child{border-right:none;}
+.step.active{background:var(--green);color:#fff;}
+.step.done{background:var(--green-pale);color:var(--green);}
+.step.inactive{background:transparent;color:var(--muted);}
+.step-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;opacity:.75;margin-bottom:2px;}
+.step-label{font-size:12px;font-weight:600;}
+
+/* SECTION TITLE */
+.section-title{font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin:0 0 12px 2px;}
+
+/* SCREEN */
+.screen{display:none;animation:fadeIn .3s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── STEP 1: TYPE PULVÉ ─── */
+.pulve-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.pulve-card{background:var(--card);border-radius:16px;border:2px solid var(--border);padding:18px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px var(--shadow);}
+.pulve-card:hover{border-color:var(--green);box-shadow:0 4px 16px var(--shadow-md);transform:translateY(-2px);}
+.pulve-card.selected{border-color:var(--green);background:var(--green-pale);box-shadow:0 4px 16px rgba(74,124,63,.2);}
+.pulve-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.pulve-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:#f0ebe3;color:var(--brown-light);}
+.pulve-tag.jet-porte{background:#e8f0fd;color:#2a5c9a;}
+.pulve-tag.pneumatique{background:var(--orange-pale);color:var(--orange);}
+.pulve-tag.aeroc{background:var(--yellow-pale);color:#a07010;}
+.pulve-tag.panneau{background:var(--green-pale);color:var(--green);}
+.pulve-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--brown);margin:6px 0 4px;}
+.pulve-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px;}
+.pulve-svg-wrap{background:var(--cream);border-radius:10px;padding:12px;margin-bottom:10px;display:flex;justify-content:center;align-items:center;height:100px;}
+.pulve-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.perf-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:8px;}
+.perf-a-plus{background:#d4edda;color:#1a6b31;}
+.perf-a{background:#d4edda;color:#2d7a3e;}
+.perf-b{background:#fff3cd;color:#856404;}
+.perf-ref{background:#f0ebe3;color:var(--muted);}
+.selected-indicator{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s;}
+.pulve-card.selected .selected-indicator{background:var(--green);border-color:var(--green);color:#fff;}
+
+/* ─── STEP 2: BUSES ─── */
+.buse-section{margin-bottom:28px;}
+.buse-section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--brown);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.buse-section-title span{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--muted);}
+
+/* Abaques couleurs ISO */
+.iso-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px;}
+.iso-card{background:var(--card);border-radius:12px;border:2px solid var(--border);padding:12px 10px;cursor:pointer;transition:all .18s;text-align:center;box-shadow:0 1px 6px var(--shadow);}
+.iso-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px var(--shadow-md);}
+.iso-card.selected{border-width:2px;box-shadow:0 4px 14px var(--shadow-md);}
+.iso-dot{width:36px;height:36px;border-radius:50%;margin:0 auto 8px;border:3px solid rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;}
+.iso-calibre{font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:var(--brown);}
+.iso-debit{font-size:10px;color:var(--muted);margin:2px 0;}
+.iso-goutte{font-size:10px;font-weight:600;padding:2px 6px;border-radius:6px;margin-top:4px;display:inline-block;}
+.tf{background:#fde;color:#c00;}
+.fi{background:#fde;color:#c55;}
+.mo{background:#e8f0fd;color:#2a5;}
+.gr{background:#e8f2e5;color:var(--green);}
+.tg{background:#e8f2e5;color:#2a6;}
+
+/* Pastilles calibrage pneumatique */
+.pastille-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px;}
+.pastille-card{background:var(--card);border-radius:10px;border:2px solid var(--border);padding:10px 8px;cursor:pointer;transition:all .18s;text-align:center;}
+.pastille-card:hover{transform:translateY(-1px);box-shadow:0 3px 10px var(--shadow-md);}
+.pastille-card.selected{border-width:2px;}
+.pastille-shape{width:30px;height:30px;border-radius:50%;margin:0 auto 6px;position:relative;display:flex;align-items:center;justify-content:center;}
+.pastille-shape::after{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.5);}
+.pastille-label{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--brown);}
+.pastille-debit{font-size:10px;color:var(--muted);}
+
+/* Type buse cards */
+.type-buse-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px;}
+.type-buse-card{background:var(--card);border-radius:14px;border:2px solid var(--border);padding:14px;cursor:pointer;transition:all .18s;box-shadow:0 1px 6px var(--shadow);}
+.type-buse-card:hover{border-color:var(--green);transform:translateY(-1px);}
+.type-buse-card.selected{border-color:var(--green);background:var(--green-pale);}
+.type-buse-svg{height:70px;width:100%;margin-bottom:8px;}
+.type-buse-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--brown);}
+.type-buse-info{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.type-buse-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.mini-tag{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;}
+.mt-green{background:var(--green-pale);color:var(--green);}
+.mt-orange{background:var(--orange-pale);color:var(--orange);}
+.mt-yellow{background:var(--yellow-pale);color:#a07010;}
+.mt-red{background:var(--red-pale);color:var(--red);}
+
+/* Abaque débit table */
+.abaque-table-wrap{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;margin-bottom:20px;overflow-x:auto;box-shadow:0 1px 6px var(--shadow);}
+.abaque-title{font-size:12px;font-weight:600;color:var(--brown);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.abaque-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:11px;}
+.abaque-table th{background:var(--cream);color:var(--muted);font-weight:600;padding:6px 8px;text-align:center;border-bottom:2px solid var(--border);}
+.abaque-table td{padding:5px 8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text);}
+.abaque-table tr.highlighted td{font-weight:700;color:var(--green);}
+.abaque-table tr:hover td{background:var(--cream);}
+.color-swatch{width:16px;height:16px;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:4px;border:2px solid rgba(0,0,0,.1);}
+
+/* ─── STEP 3: RÉGLAGES ─── */
+.score-banner{background:var(--card);border-radius:16px;padding:18px 22px;margin-bottom:22px;box-shadow:0 2px 12px var(--shadow),0 0 0 1px var(--border);display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.score-circle-wrap{position:relative;width:78px;height:78px;flex-shrink:0;}
+.score-circle-wrap svg{transform:rotate(-90deg);}
+.score-circle-bg{fill:none;stroke:var(--border);stroke-width:7;}
+.score-circle-fill{fill:none;stroke:var(--green);stroke-width:7;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset .5s ease,stroke .4s;}
+.score-text-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-pct{font-family:'DM Mono',monospace;font-size:19px;color:var(--brown);line-height:1;}
+.score-lbl{font-size:8px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:2px;}
+.score-info{flex:1;min-width:130px;}
+.score-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--brown);margin-bottom:4px;}
+.score-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+.score-badge{font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;white-space:nowrap;}
+.badge-ready{background:var(--green-pale);color:var(--green);border:1.5px solid rgba(74,124,63,.25);}
+.badge-warn-g{background:var(--yellow-pale);color:var(--yellow);border:1.5px solid rgba(212,160,23,.25);}
+.badge-nok-g{background:var(--red-pale);color:var(--red);border:1.5px solid rgba(181,58,42,.25);}
+.badge-wait{background:#f0ebe3;color:var(--brown-light);border:1.5px solid var(--border);}
+
+.param-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+.card{background:var(--card);border-radius:14px;padding:16px;box-shadow:0 2px 10px var(--shadow),0 0 0 1px var(--border);transition:box-shadow .2s,transform .15s;}
+.card:hover{box-shadow:0 5px 20px var(--shadow-md),0 0 0 1px var(--border);transform:translateY(-1px);}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.card-icon-wrap{display:flex;align-items:center;gap:9px;}
+.card-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.ic-green{background:var(--green-pale);}
+.ic-brown{background:#f2ebe2;}
+.ic-blue{background:#e8f0fd;}
+.ic-orange{background:var(--orange-pale);}
+.card-num{font-size:9px;color:var(--brown-light);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:1px;}
+.card-title{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--brown);}
+.status-pill{font-size:10px;font-weight:600;padding:3px 8px;border-radius:16px;flex-shrink:0;}
+.pill-ok{background:var(--green-pale);color:var(--green);}
+.pill-warn{background:var(--yellow-pale);color:var(--yellow);}
+.pill-bad{background:var(--red-pale);color:var(--red);}
+.pill-na{background:#f0ebe3;color:var(--brown-light);}
+
+.field-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:5px;display:block;}
+.mt10{margin-top:10px;}
+.mt12{margin-top:12px;}
+
+select{width:100%;background:var(--cream);border:1.5px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:7px 28px 7px 9px;border-radius:9px;outline:none;cursor:pointer;transition:border-color .2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239c8370' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+select:focus{border-color:var(--green);}
+
+input[type="number"]{background:var(--cream);border:1.5px solid var(--border);color:var(--text);font-family:'DM Mono',monospace;font-size:18px;font-weight:500;padding:5px 9px;border-radius:9px;outline:none;width:100%;transition:border-color .2s;}
+input[type="number"]:focus{border-color:var(--green);}
+input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;outline:none;margin:7px 0 3px;cursor:pointer;}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--card);border:2.5px solid var(--green);border-radius:50%;cursor:pointer;transition:transform .15s;box-shadow:0 1px 4px var(--shadow);}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+
+.range-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:1px;}
+.range-val{font-family:'DM Mono',monospace;font-size:13px;color:var(--brown);background:var(--cream);padding:3px 9px;border-radius:7px;border:1.5px solid var(--border);}
+
+.toggle-group{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px;}
+.tog{font-size:11px;font-weight:500;padding:5px 10px;border-radius:16px;border:1.5px solid var(--border);background:var(--cream);color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tog:hover{border-color:var(--brown-light);color:var(--brown-mid);}
+.tog.ok.active{background:var(--green-pale);border-color:var(--green);color:var(--green);font-weight:600;}
+.tog.warn.active{background:var(--yellow-pale);border-color:var(--yellow);color:var(--yellow);font-weight:600;}
+.tog.bad.active{background:var(--red-pale);border-color:var(--red);color:var(--red);font-weight:600;}
+
+.gauge-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:2px;}
+.gauge-fill{height:100%;border-radius:2px;transition:width .3s ease,background .3s;}
+
+.result-box{display:flex;align-items:center;justify-content:space-between;background:var(--green-pale);border:1.5px solid rgba(74,124,63,.2);border-radius:11px;padding:10px 14px;margin-top:12px;}
+.result-box.warn{background:var(--orange-pale);border-color:rgba(200,98,26,.2);}
+.result-box.bad{background:var(--red-pale);border-color:rgba(181,58,42,.2);}
+.result-label{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+.result-note{font-size:10px;color:var(--muted);margin-top:1px;}
+.result-num{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--green);}
+.result-unit{font-size:11px;color:var(--muted);margin-left:2px;}
+
+.alert-strip{display:none;background:var(--red-pale);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:7px 11px;margin-top:10px;font-size:11px;color:var(--red);font-weight:500;line-height:1.5;}
+.alert-strip.visible{display:block;}
+
+.meteo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;}
+.meteo-cell{background:var(--cream);border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;}
+.meteo-cell-label{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.meteo-cell input[type="number"]{background:transparent;border:none;font-size:20px;padding:0;border-radius:0;color:var(--brown);width:65px;}
+.meteo-cell input[type="number"]:focus{border:none;outline:none;}
+.meteo-unit{font-size:12px;color:var(--muted);font-weight:500;}
+.meteo-cell select{font-size:12px;background:transparent;border:none;padding:0;background-image:none;margin-top:4px;}
+
+.split-visual{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.split-bar{flex:1;height:9px;border-radius:4px;overflow:hidden;display:flex;}
+.split-l{background:var(--green);transition:width .3s;}
+.split-r{background:var(--orange);transition:width .3s;}
+.split-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);min-width:32px;}
+
+/* NAV BUTTONS */
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px;flex-wrap:wrap;}
+.btn{font-family:'DM Sans',sans-serif;font-weight:600;font-size:13px;padding:10px 22px;border-radius:11px;border:none;cursor:pointer;transition:all .15s;}
+.btn-ghost{background:var(--card);color:var(--muted);border:1.5px solid var(--border);}
+.btn-ghost:hover{border-color:var(--brown-light);color:var(--brown-mid);}
+.btn-main{background:var(--green);color:#fff;box-shadow:0 3px 10px rgba(74,124,63,.3);}
+.btn-main:hover{filter:brightness(1.07);transform:translateY(-1px);}
+.btn-main:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* Context info banner */
+.context-banner{background:var(--green-pale);border:1.5px solid rgba(74,124,63,.2);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.context-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:500;}
+.context-icon{width:24px;height:24px;background:rgba(74,124,63,.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-block">
+    <div class="logo-mark">💧</div>
+    <div>
+      <div class="logo-name">PulvéRéglage</div>
+      <div class="logo-sub">Contrôle des paramètres de traitement</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-chip"><div class="live-dot"></div>En direct</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<!-- STEP NAV -->
+<div class="step-nav">
+  <div class="step active" id="sn1" onclick="goStep(1)">
+    <div class="step-num">Étape 1</div>
+    <div class="step-label">🚜 Appareil</div>
+  </div>
+  <div class="step inactive" id="sn2" onclick="goStep(2)">
+    <div class="step-num">Étape 2</div>
+    <div class="step-label">🔩 Buses</div>
+  </div>
+  <div class="step inactive" id="sn3" onclick="goStep(3)">
+    <div class="step-num">Étape 3</div>
+    <div class="step-label">⚙️ Réglages</div>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 1: TYPE PULVÉ ═══════════════ -->
+<div class="screen active" id="screen1">
+  <div class="section-title">Choisissez votre type de pulvérisateur</div>
+  <div class="pulve-grid">
+
+    <!-- FACE PAR FACE JET PORTÉ -->
+    <div class="pulve-card" onclick="selectPulve(this,'fpf-jp','Face par face — Jet porté')" data-cat="jet-porte">
+      <div class="pulve-card-header">
+        <div class="pulve-tag jet-porte">Jet porté</div>
+        <div class="selected-indicator">✓</div>
+      </div>
+      <div class="pulve-svg-wrap">
+        <svg width="200" height="80" viewBox="0 0 200 80">
+          <!-- Rang gauche -->
+          <rect x="10" y="10" width="8" height="60" rx="2" fill="#7db56e" opacity=".7"/>
+          <!-- Rang droit -->
+          <rect x="182" y="10" width="8" height="60" rx="2" fill="#7db56e" opacity=".7"/>
+          <!-- Tracteur central -->
+          <rect x="85" y="25" width="30" height="30" rx="4" fill="#c4a882"/>
+          <rect x="90" y="20" width="20" height="10" rx="2" fill="#9c8370"/>
+          <!-- Descentes gauche -->
+          <line x1="85" y1="30" x2="30" y2="20" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="85" y1="40" x2="30" y2="40" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="85" y1="50" x2="30" y2="60" stroke="#3d2b1f" stroke-width="1.5"/>
+          <!-- Jets gauche -->
+          <path d="M30 20 Q15 20 10 18" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M30 40 Q15 40 10 40" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M30 60 Q15 62 10 62" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <!-- Descentes droite -->
+          <line x1="115" y1="30" x2="170" y2="20" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="115" y1="40" x2="170" y2="40" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="115" y1="50" x2="170" y2="60" stroke="#3d2b1f" stroke-width="1.5"/>
+          <!-- Jets droit -->
+          <path d="M170 20 Q185 20 190 18" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M170 40 Q185 40 190 40" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M170 60 Q185 62 190 62" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <!-- Labels -->
+          <text x="100" y="75" text-anchor="middle" font-size="8" fill="#9c8370" font-family="DM Sans">face par face — toutes faces traitées</text>
+        </svg>
+      </div>
+      <div class="pulve-name">Face par face — Jet porté</div>
+      <div class="pulve-desc">Descentes des deux côtés. Toutes les faces du rang traitées. Technologie la plus performante pour la vigne.</div>
+      <div class="pulve-badges">
+        <span class="perf-badge perf-a-plus">Performance A+</span>
+        <span class="mini-tag mt-green">ZNT réduit</span>
+      </div>
+    </div>
+
+    <!-- FACE PAR FACE PNEUMATIQUE -->
+    <div class="pulve-card" onclick="selectPulve(this,'fpf-pn','Face par face — Pneumatique')" data-cat="pneumatique">
+      <div class="pulve-card-header">
+        <div class="pulve-tag pneumatique">Pneumatique</div>
+        <div class="selected-indicator">✓</div>
+      </div>
+      <div class="pulve-svg-wrap">
+        <svg width="200" height="80" viewBox="0 0 200 80">
+          <rect x="10" y="10" width="8" height="60" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="182" y="10" width="8" height="60" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="85" y="25" width="30" height="30" rx="4" fill="#c4a882"/>
+          <rect x="90" y="20" width="20" height="10" rx="2" fill="#9c8370"/>
+          <!-- Turbines -->
+          <circle cx="60" cy="40" r="14" fill="none" stroke="#c8621a" stroke-width="2"/>
+          <circle cx="60" cy="40" r="5" fill="#c8621a" opacity=".4"/>
+          <line x1="60" y1="26" x2="60" y2="34" stroke="#c8621a" stroke-width="1.5"/>
+          <line x1="60" y1="46" x2="60" y2="54" stroke="#c8621a" stroke-width="1.5"/>
+          <line x1="46" y1="40" x2="54" y2="40" stroke="#c8621a" stroke-width="1.5"/>
+          <line x1="66" y1="40" x2="74" y2="40" stroke="#c8621a" stroke-width="1.5"/>
+          <circle cx="140" cy="40" r="14" fill="none" stroke="#c8621a" stroke-width="2"/>
+          <circle cx="140" cy="40" r="5" fill="#c8621a" opacity=".4"/>
+          <line x1="140" y1="26" x2="140" y2="34" stroke="#c8621a" stroke-width="1.5"/>
+          <line x1="140" y1="46" x2="140" y2="54" stroke="#c8621a" stroke-width="1.5"/>
+          <line x1="126" y1="40" x2="134" y2="40" stroke="#c8621a" stroke-width="1.5"/>
+          <line x1="146" y1="40" x2="154" y2="40" stroke="#c8621a" stroke-width="1.5"/>
+          <!-- Jets fins = dérive -->
+          <path d="M46 38 Q28 30 10 28" stroke="#c8621a" stroke-width="1" fill="none" stroke-dasharray="2,2" opacity=".7"/>
+          <path d="M154 38 Q172 30 190 28" stroke="#c8621a" stroke-width="1" fill="none" stroke-dasharray="2,2" opacity=".7"/>
+          <text x="100" y="75" text-anchor="middle" font-size="8" fill="#9c8370" font-family="DM Sans">pneumatique — dérive plus importante</text>
+        </svg>
+      </div>
+      <div class="pulve-name">Face par face — Pneumatique</div>
+      <div class="pulve-desc">Turbines de chaque côté. Bonne couverture mais dérive plus importante que le jet porté.</div>
+      <div class="pulve-badges">
+        <span class="perf-badge perf-a">Performance A</span>
+        <span class="mini-tag mt-orange">Dérive modérée</span>
+      </div>
+    </div>
+
+    <!-- VOÛTE PNEUMATIQUE -->
+    <div class="pulve-card" onclick="selectPulve(this,'voute-pn','Voûte pneumatique')" data-cat="pneumatique">
+      <div class="pulve-card-header">
+        <div class="pulve-tag pneumatique">Pneumatique</div>
+        <div class="selected-indicator">✓</div>
+      </div>
+      <div class="pulve-svg-wrap">
+        <svg width="200" height="80" viewBox="0 0 200 80">
+          <!-- Rangs -->
+          <rect x="20" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="88" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="156" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <!-- Voûte -->
+          <path d="M50 15 Q100 5 150 15 L150 65 Q100 75 50 65 Z" fill="none" stroke="#9c8370" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <!-- Turbine centrale -->
+          <rect x="88" y="28" width="24" height="24" rx="4" fill="#c4a882"/>
+          <circle cx="100" cy="40" r="10" fill="none" stroke="#c8621a" stroke-width="2"/>
+          <circle cx="100" cy="40" r="4" fill="#c8621a" opacity=".4"/>
+          <!-- Mains -->
+          <line x1="88" y1="32" x2="50" y2="20" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="112" y1="32" x2="150" y2="20" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="85" y1="48" x2="30" y2="60" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="115" y1="48" x2="170" y2="60" stroke="#3d2b1f" stroke-width="1.5"/>
+          <!-- Canons -->
+          <circle cx="50" cy="20" r="5" fill="#c8621a" opacity=".6"/>
+          <circle cx="150" cy="20" r="5" fill="#c8621a" opacity=".6"/>
+          <!-- Jets -->
+          <path d="M45 18 Q27 14 20 12" stroke="#c8621a" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <path d="M155 18 Q173 14 180 12" stroke="#c8621a" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <path d="M28 60 Q24 62 20 64" stroke="#c8621a" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <path d="M172 60 Q176 62 180 64" stroke="#c8621a" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+          <text x="100" y="78" text-anchor="middle" font-size="8" fill="#9c8370" font-family="DM Sans">voûte — mains + canons — 2 à 3 rangs</text>
+        </svg>
+      </div>
+      <div class="pulve-name">Voûte pneumatique</div>
+      <div class="pulve-desc">Traitement de 2 à 3 rangs par passage. Mains de retour + canons. Référence historique du parc français.</div>
+      <div class="pulve-badges">
+        <span class="perf-badge perf-ref">Référence du parc</span>
+        <span class="mini-tag mt-yellow">2–3 rangs/passage</span>
+      </div>
+    </div>
+
+    <!-- VOÛTE JET PORTÉ -->
+    <div class="pulve-card" onclick="selectPulve(this,'voute-jp','Voûte — Jet porté')" data-cat="jet-porte">
+      <div class="pulve-card-header">
+        <div class="pulve-tag jet-porte">Jet porté</div>
+        <div class="selected-indicator">✓</div>
+      </div>
+      <div class="pulve-svg-wrap">
+        <svg width="200" height="80" viewBox="0 0 200 80">
+          <rect x="20" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="88" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="156" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <path d="M50 15 Q100 5 150 15 L150 65 Q100 75 50 65 Z" fill="none" stroke="#9c8370" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <rect x="88" y="28" width="24" height="24" rx="4" fill="#c4a882"/>
+          <!-- Jets portés = buses -->
+          <line x1="88" y1="32" x2="50" y2="20" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="112" y1="32" x2="150" y2="20" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="85" y1="48" x2="30" y2="60" stroke="#3d2b1f" stroke-width="1.5"/>
+          <line x1="115" y1="48" x2="170" y2="60" stroke="#3d2b1f" stroke-width="1.5"/>
+          <!-- Buses jet porté (carrés) -->
+          <rect x="46" y="16" width="8" height="8" rx="2" fill="#4a7c3f"/>
+          <rect x="146" y="16" width="8" height="8" rx="2" fill="#4a7c3f"/>
+          <rect x="26" y="56" width="8" height="8" rx="2" fill="#4a7c3f"/>
+          <rect x="166" y="56" width="8" height="8" rx="2" fill="#4a7c3f"/>
+          <!-- Jets propres -->
+          <path d="M46 20 Q30 20 20 18" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M154 20 Q170 20 180 18" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M26 62 Q21 63 20 64" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M174 62 Q179 63 180 64" stroke="#4a7c3f" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <text x="100" y="78" text-anchor="middle" font-size="8" fill="#9c8370" font-family="DM Sans">voûte jet porté — buses à fente</text>
+        </svg>
+      </div>
+      <div class="pulve-name">Voûte — Jet porté</div>
+      <div class="pulve-desc">Configuration voûte avec technologie jet porté (buses à fente). Meilleure maîtrise de la dérive que la voûte pneumatique.</div>
+      <div class="pulve-badges">
+        <span class="perf-badge perf-a">Performance A/B</span>
+        <span class="mini-tag mt-green">Dérive réduite</span>
+      </div>
+    </div>
+
+    <!-- PANNEAUX RÉCUPÉRATEURS -->
+    <div class="pulve-card" onclick="selectPulve(this,'panneau-jp','Panneaux récupérateurs — Jet porté')" data-cat="panneau">
+      <div class="pulve-card-header">
+        <div class="pulve-tag panneau">Panneaux récup.</div>
+        <div class="selected-indicator">✓</div>
+      </div>
+      <div class="pulve-svg-wrap">
+        <svg width="200" height="80" viewBox="0 0 200 80">
+          <!-- Rang végétation -->
+          <rect x="88" y="5" width="24" height="70" rx="3" fill="#7db56e" opacity=".5"/>
+          <!-- Panneaux gauche -->
+          <rect x="40" y="10" width="6" height="60" rx="2" fill="#9c8370"/>
+          <!-- Panneaux droit -->
+          <rect x="154" y="10" width="6" height="60" rx="2" fill="#9c8370"/>
+          <!-- Tracteur -->
+          <rect x="88" y="28" width="24" height="24" rx="4" fill="#c4a882" opacity=".5"/>
+          <!-- Bras porteurs -->
+          <line x1="88" y1="35" x2="46" y2="35" stroke="#3d2b1f" stroke-width="2"/>
+          <line x1="112" y1="35" x2="154" y2="35" stroke="#3d2b1f" stroke-width="2"/>
+          <line x1="88" y1="45" x2="46" y2="45" stroke="#3d2b1f" stroke-width="2"/>
+          <line x1="112" y1="45" x2="154" y2="45" stroke="#3d2b1f" stroke-width="2"/>
+          <!-- Buses jet porté -->
+          <rect x="48" y="31" width="7" height="7" rx="1" fill="#4a7c3f"/>
+          <rect x="48" y="42" width="7" height="7" rx="1" fill="#4a7c3f"/>
+          <rect x="145" y="31" width="7" height="7" rx="1" fill="#4a7c3f"/>
+          <rect x="145" y="42" width="7" height="7" rx="1" fill="#4a7c3f"/>
+          <!-- Jets (vers végétation) -->
+          <path d="M55 35 L85 35" stroke="#4a7c3f" stroke-width="2" stroke-dasharray="3,2"/>
+          <path d="M55 46 L85 46" stroke="#4a7c3f" stroke-width="2" stroke-dasharray="3,2"/>
+          <path d="M145 35 L115 35" stroke="#4a7c3f" stroke-width="2" stroke-dasharray="3,2"/>
+          <path d="M145 46 L115 46" stroke="#4a7c3f" stroke-width="2" stroke-dasharray="3,2"/>
+          <!-- Récupération flèche -->
+          <path d="M40 68 Q30 72 40 72 Q50 72 45 68" stroke="#c8621a" stroke-width="1.5" fill="none"/>
+          <path d="M160 68 Q170 72 160 72 Q150 72 155 68" stroke="#c8621a" stroke-width="1.5" fill="none"/>
+          <text x="30" y="78" font-size="7" fill="#c8621a" font-family="DM Sans">récup.</text>
+          <text x="148" y="78" font-size="7" fill="#c8621a" font-family="DM Sans">récup.</text>
+          <text x="100" y="78" text-anchor="middle" font-size="8" fill="#9c8370" font-family="DM Sans">confinement — 30–80% récupéré</text>
+        </svg>
+      </div>
+      <div class="pulve-name">Panneaux récupérateurs — Jet porté</div>
+      <div class="pulve-desc">Confine la bouillie entre deux panneaux. Récupération 30–80%. Solution la plus vertueuse environnementalement.</div>
+      <div class="pulve-badges">
+        <span class="perf-badge perf-a-plus">Performance A+</span>
+        <span class="mini-tag mt-green">ZNT minimal</span>
+        <span class="mini-tag mt-green">Économie 30–80%</span>
+      </div>
+    </div>
+
+    <!-- AÉROCONVECTEUR -->
+    <div class="pulve-card" onclick="selectPulve(this,'aeroc','Aéroconvecteur')" data-cat="aeroc">
+      <div class="pulve-card-header">
+        <div class="pulve-tag aeroc">Aéroconvecteur</div>
+        <div class="selected-indicator">✓</div>
+      </div>
+      <div class="pulve-svg-wrap">
+        <svg width="200" height="80" viewBox="0 0 200 80">
+          <rect x="20" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="100" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <rect x="173" y="8" width="7" height="64" rx="2" fill="#7db56e" opacity=".7"/>
+          <!-- Appareil central -->
+          <rect x="55" y="22" width="50" height="36" rx="4" fill="#e0c898"/>
+          <!-- Grande turbine axiale -->
+          <circle cx="80" cy="40" r="16" fill="none" stroke="#d4a017" stroke-width="2.5"/>
+          <circle cx="80" cy="40" r="5" fill="#d4a017" opacity=".5"/>
+          <!-- Pales -->
+          <line x1="80" y1="24" x2="78" y2="32" stroke="#d4a017" stroke-width="2"/>
+          <line x1="80" y1="56" x2="82" y2="48" stroke="#d4a017" stroke-width="2"/>
+          <line x1="64" y1="40" x2="72" y2="38" stroke="#d4a017" stroke-width="2"/>
+          <line x1="96" y1="40" x2="88" y2="42" stroke="#d4a017" stroke-width="2"/>
+          <!-- Diffuseurs orientables -->
+          <rect x="26" y="30" width="30" height="8" rx="3" fill="#c4a882"/>
+          <rect x="26" y="42" width="30" height="8" rx="3" fill="#c4a882"/>
+          <!-- Jets larges + dérive -->
+          <path d="M26 34 Q18 32 20 28 Q22 24 16 22" stroke="#d4a017" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M26 46 Q18 46 20 50 Q22 54 16 56" stroke="#d4a017" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+          <path d="M8 28 Q4 26 2 24" stroke="#d4a017" stroke-width="1" fill="none" opacity=".5"/>
+          <!-- Légende dérive -->
+          <text x="100" y="78" text-anchor="middle" font-size="8" fill="#9c8370" font-family="DM Sans">uniface — turbine axiale — 2–4 rangs</text>
+        </svg>
+      </div>
+      <div class="pulve-name">Aéroconvecteur</div>
+      <div class="pulve-desc">Traitement uniface. Grande turbine axiale ou tangentielle avec diffuseurs orientables. Traite 2 à 4 rangs. Dérive plus élevée.</div>
+      <div class="pulve-badges">
+        <span class="perf-badge perf-b">Performance B/C</span>
+        <span class="mini-tag mt-yellow">Uniface</span>
+        <span class="mini-tag mt-orange">Dérive à maîtriser</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="nav-row">
+    <div></div>
+    <button class="btn btn-main" id="btn1next" disabled onclick="goStep(2)">Choisir les buses →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 2: BUSES ═══════════════ -->
+<div class="screen" id="screen2">
+  <div class="context-banner" id="pulve-context">
+    <div class="context-icon">🚜</div>
+    <div class="context-item" id="ctx-pulve-name">—</div>
+  </div>
+
+  <!-- TYPE DE BUSE -->
+  <div class="buse-section">
+    <div class="buse-section-title">Type de buse <span>— Choisissez selon votre technologie</span></div>
+    <div class="type-buse-grid" id="type-buse-grid">
+      <!-- peuplé dynamiquement selon le type de pulvé -->
+    </div>
+  </div>
+
+  <!-- CALIBRE ISO / COULEUR -->
+  <div class="buse-section">
+    <div class="buse-section-title">Calibre ISO — Couleur <span>— Norme ISO 10625 — débit à 3 bar</span></div>
+    <div class="iso-grid">
+
+      <div class="iso-card" onclick="selectISO(this,'01','orange','0.40','TF','Très fines')" style="border-color:#e07820">
+        <div class="iso-dot" style="background:#e07820"><span style="color:#fff;font-size:9px;font-weight:700">01</span></div>
+        <div class="iso-calibre">01</div>
+        <div class="iso-debit">0.40 L/min</div>
+        <div class="iso-goutte tf">Très fines</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'015','vert','0.60','TF-F','Très fines–Fines')" style="border-color:#2d8a3e">
+        <div class="iso-dot" style="background:#2d8a3e"><span style="color:#fff;font-size:9px;font-weight:700">015</span></div>
+        <div class="iso-calibre">015</div>
+        <div class="iso-debit">0.60 L/min</div>
+        <div class="iso-goutte fi">Fines</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'02','jaune','0.80','F-M','Fines–Moyennes')" style="border-color:#d4a017">
+        <div class="iso-dot" style="background:#d4a017"><span style="color:#fff;font-size:9px;font-weight:700">02</span></div>
+        <div class="iso-calibre">02</div>
+        <div class="iso-debit">0.80 L/min</div>
+        <div class="iso-goutte mo">Moyennes</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'025','lilas','1.00','M','Moyennes')" style="border-color:#9b59b6">
+        <div class="iso-dot" style="background:#9b59b6"><span style="color:#fff;font-size:9px;font-weight:700">025</span></div>
+        <div class="iso-calibre">025</div>
+        <div class="iso-debit">1.00 L/min</div>
+        <div class="iso-goutte mo">Moyennes</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'03','bleu','1.20','M-G','Moyennes–Grosses')" style="border-color:#2470c8">
+        <div class="iso-dot" style="background:#2470c8"><span style="color:#fff;font-size:9px;font-weight:700">03</span></div>
+        <div class="iso-calibre">03</div>
+        <div class="iso-debit">1.20 L/min</div>
+        <div class="iso-goutte gr">Grosses</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'04','rouge','1.60','G','Grosses')" style="border-color:#b53a2a">
+        <div class="iso-dot" style="background:#b53a2a"><span style="color:#fff;font-size:9px;font-weight:700">04</span></div>
+        <div class="iso-calibre">04</div>
+        <div class="iso-debit">1.60 L/min</div>
+        <div class="iso-goutte gr">Grosses</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'05','marron','2.00','G-TG','Grosses–TG')" style="border-color:#7a5c46">
+        <div class="iso-dot" style="background:#7a5c46"><span style="color:#fff;font-size:9px;font-weight:700">05</span></div>
+        <div class="iso-calibre">05</div>
+        <div class="iso-debit">2.00 L/min</div>
+        <div class="iso-goutte tg">Très grosses</div>
+      </div>
+
+      <div class="iso-card" onclick="selectISO(this,'06','gris','2.40','TG','Très grosses')" style="border-color:#7a8c8a">
+        <div class="iso-dot" style="background:#7a8c8a"><span style="color:#fff;font-size:9px;font-weight:700">06</span></div>
+        <div class="iso-calibre">06</div>
+        <div class="iso-debit">2.40 L/min</div>
+        <div class="iso-goutte tg">Très grosses</div>
+      </div>
+
+    </div>
+
+    <!-- ABAQUE DÉBIT EN TABLEAU -->
+    <div class="abaque-table-wrap">
+      <div class="abaque-title">📊 Abaque débit (L/min) selon pression — buses à fente ISO <span id="abaque-selected-label" style="font-family:'DM Mono',monospace;color:var(--green);margin-left:8px"></span></div>
+      <div style="overflow-x:auto;">
+        <table class="abaque-table">
+          <thead>
+            <tr>
+              <th>Calibre</th>
+              <th>Couleur</th>
+              <th>1 bar</th>
+              <th>2 bar</th>
+              <th>3 bar ✓</th>
+              <th>4 bar</th>
+              <th>5 bar</th>
+              <th>6 bar</th>
+              <th>8 bar</th>
+              <th>Gouttes</th>
+            </tr>
+          </thead>
+          <tbody id="abaque-body">
+            <!-- JS généré -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASTILLES PNEUMATIQUE (visible si pneumatique) -->
+  <div class="buse-section" id="pastille-section" style="display:none">
+    <div class="buse-section-title">Pastilles de calibrage <span>— Pour voûtes pneumatiques (couleurs constructeur)</span></div>
+    <div class="pastille-grid">
+      <div class="pastille-card" onclick="selectPastille(this,'rouge','0.5–0.8','0.5–0.8')">
+        <div class="pastille-shape" style="background:#c0392b;"></div>
+        <div class="pastille-label">Rouge</div>
+        <div class="pastille-debit">0.5–0.8 L/min</div>
+      </div>
+      <div class="pastille-card" onclick="selectPastille(this,'orange','0.8–1.2','0.8–1.2')">
+        <div class="pastille-shape" style="background:#e07820;"></div>
+        <div class="pastille-label">Orange</div>
+        <div class="pastille-debit">0.8–1.2 L/min</div>
+      </div>
+      <div class="pastille-card" onclick="selectPastille(this,'jaune','1.2–1.6','1.2–1.6')">
+        <div class="pastille-shape" style="background:#d4a017;"></div>
+        <div class="pastille-label">Jaune</div>
+        <div class="pastille-debit">1.2–1.6 L/min</div>
+      </div>
+      <div class="pastille-card" onclick="selectPastille(this,'vert','1.6–2.0','1.6–2.0')">
+        <div class="pastille-shape" style="background:#2d8a3e;"></div>
+        <div class="pastille-label">Vert</div>
+        <div class="pastille-debit">1.6–2.0 L/min</div>
+      </div>
+      <div class="pastille-card" onclick="selectPastille(this,'bleu','2.0–2.5','2.0–2.5')">
+        <div class="pastille-shape" style="background:#2470c8;"></div>
+        <div class="pastille-label">Bleu</div>
+        <div class="pastille-debit">2.0–2.5 L/min</div>
+      </div>
+      <div class="pastille-card" onclick="selectPastille(this,'blanc','2.5–3.5','2.5–3.5')">
+        <div class="pastille-shape" style="background:#ddd;border:2px solid #bbb;"></div>
+        <div class="pastille-label">Blanc</div>
+        <div class="pastille-debit">2.5–3.5 L/min</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;padding:8px 12px;background:var(--yellow-pale);border-radius:8px;border-left:3px solid var(--yellow);">
+      ⚠ Les couleurs des pastilles varient selon les constructeurs — consulter le tableau du manuel de l'appareil.
+    </div>
+  </div>
+
+  <!-- SCHÉMAS JETS -->
+  <div class="buse-section">
+    <div class="buse-section-title">Schémas des jets <span>— Profil de pulvérisation selon le type</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+
+      <!-- ATR / Turbulence -->
+      <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;box-shadow:0 1px 6px var(--shadow);">
+        <svg width="100%" height="90" viewBox="0 0 160 90">
+          <!-- Corps buse -->
+          <rect x="70" y="2" width="20" height="18" rx="3" fill="#c4a882"/>
+          <circle cx="80" cy="22" r="5" fill="#9c8370"/>
+          <!-- Jet conique creux -->
+          <path d="M75 27 Q50 60 30 85" stroke="#2470c8" stroke-width="2.5" fill="none"/>
+          <path d="M85 27 Q110 60 130 85" stroke="#2470c8" stroke-width="2.5" fill="none"/>
+          <!-- Remplissage intérieur creux -->
+          <path d="M75 27 Q50 60 30 85 Q80 75 130 85 Q110 60 85 27 Z" fill="#2470c8" fill-opacity=".08"/>
+          <!-- Gouttes -->
+          <circle cx="35" cy="80" r="2" fill="#2470c8" opacity=".6"/>
+          <circle cx="55" cy="72" r="1.5" fill="#2470c8" opacity=".5"/>
+          <circle cx="125" cy="80" r="2" fill="#2470c8" opacity=".6"/>
+          <circle cx="105" cy="72" r="1.5" fill="#2470c8" opacity=".5"/>
+          <text x="80" y="87" text-anchor="middle" font-size="9" fill="#9c8370" font-family="DM Sans" font-weight="600">ATR — Jet conique creux</text>
+        </svg>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Buses à turbulence. Jet conique creux. Très fines gouttelettes. Viti/arbo jet porté.</div>
+        <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+          <span class="mini-tag mt-orange">5–15 bar</span>
+          <span class="mini-tag mt-yellow">Pénétration ++</span>
+        </div>
+      </div>
+
+      <!-- Fente plate classique -->
+      <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;box-shadow:0 1px 6px var(--shadow);">
+        <svg width="100%" height="90" viewBox="0 0 160 90">
+          <rect x="65" y="2" width="30" height="14" rx="3" fill="#c4a882"/>
+          <rect x="68" y="16" width="24" height="6" rx="2" fill="#9c8370"/>
+          <!-- Jet plat -->
+          <path d="M72 22 L20 80" stroke="#4a7c3f" stroke-width="2.5" fill="none"/>
+          <path d="M88 22 L140 80" stroke="#4a7c3f" stroke-width="2.5" fill="none"/>
+          <path d="M72 22 L20 80 L140 80 L88 22 Z" fill="#4a7c3f" fill-opacity=".1"/>
+          <!-- Angle -->
+          <path d="M72 38 Q80 36 88 38" stroke="#4a7c3f" stroke-width="1" fill="none" stroke-dasharray="2,2"/>
+          <text x="80" y="50" text-anchor="middle" font-size="9" fill="#4a7c3f">80°–110°</text>
+          <circle cx="22" cy="79" r="2" fill="#4a7c3f" opacity=".5"/>
+          <circle cx="50" cy="69" r="1.5" fill="#4a7c3f" opacity=".4"/>
+          <circle cx="138" cy="79" r="2" fill="#4a7c3f" opacity=".5"/>
+          <text x="80" y="89" text-anchor="middle" font-size="9" fill="#9c8370" font-family="DM Sans" font-weight="600">Fente plate — APE / AXI</text>
+        </svg>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Jet plat uniforme. Usage grandes cultures / herbicides. Angle 80° ou 110°.</div>
+        <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+          <span class="mini-tag mt-green">1–5 bar</span>
+          <span class="mini-tag mt-green">Couverture homogène</span>
+        </div>
+      </div>
+
+      <!-- Injection d'air AVI/IDK -->
+      <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;box-shadow:0 1px 6px var(--shadow);">
+        <svg width="100%" height="90" viewBox="0 0 160 90">
+          <rect x="60" y="2" width="40" height="14" rx="3" fill="#c4a882"/>
+          <!-- Entrées d'air -->
+          <circle cx="63" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+          <circle cx="97" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+          <text x="63" y="11" text-anchor="middle" font-size="6" fill="#c8621a">air</text>
+          <text x="97" y="11" text-anchor="middle" font-size="6" fill="#c8621a">air</text>
+          <rect x="64" y="16" width="32" height="6" rx="2" fill="#9c8370"/>
+          <!-- Grosses gouttes -->
+          <path d="M70 22 L28 78" stroke="#9b59b6" stroke-width="2.5" fill="none"/>
+          <path d="M90 22 L132 78" stroke="#9b59b6" stroke-width="2.5" fill="none"/>
+          <path d="M70 22 L28 78 L132 78 L90 22 Z" fill="#9b59b6" fill-opacity=".08"/>
+          <!-- Grosses gouttes schéma -->
+          <circle cx="35" cy="75" r="4" fill="#9b59b6" opacity=".5"/>
+          <circle cx="55" cy="67" r="3.5" fill="#9b59b6" opacity=".4"/>
+          <circle cx="125" cy="75" r="4" fill="#9b59b6" opacity=".5"/>
+          <circle cx="105" cy="67" r="3.5" fill="#9b59b6" opacity=".4"/>
+          <text x="80" y="89" text-anchor="middle" font-size="9" fill="#9c8370" font-family="DM Sans" font-weight="600">Injection d'air — AVI / IDK / CVI</text>
+        </svg>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Mélange air + bouillie. Grosses gouttes. Anti-dérive. ZNT réduit. Recommandées panneaux récup.</div>
+        <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+          <span class="mini-tag mt-green">ZNT ✓</span>
+          <span class="mini-tag mt-green">Anti-dérive</span>
+          <span class="mini-tag mt-orange">3–8 bar</span>
+        </div>
+      </div>
+
+      <!-- Miroir / creux -->
+      <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;box-shadow:0 1px 6px var(--shadow);">
+        <svg width="100%" height="90" viewBox="0 0 160 90">
+          <rect x="68" y="2" width="24" height="14" rx="3" fill="#c4a882"/>
+          <rect x="72" y="16" width="16" height="6" rx="2" fill="#9c8370"/>
+          <!-- Jet double (miroir) -->
+          <path d="M76 22 L40 60" stroke="#d4a017" stroke-width="2" fill="none"/>
+          <path d="M84 22 L120 60" stroke="#d4a017" stroke-width="2" fill="none"/>
+          <!-- Deuxième jet symétrique -->
+          <path d="M76 22 L55 70" stroke="#d4a017" stroke-width="2" fill="none" opacity=".6"/>
+          <path d="M84 22 L105 70" stroke="#d4a017" stroke-width="2" fill="none" opacity=".6"/>
+          <!-- Double impact -->
+          <ellipse cx="80" cy="65" rx="30" ry="6" fill="#d4a017" fill-opacity=".12"/>
+          <text x="80" y="55" text-anchor="middle" font-size="9" fill="#d4a017">double jet</text>
+          <text x="80" y="89" text-anchor="middle" font-size="9" fill="#9c8370" font-family="DM Sans" font-weight="600">Miroir / Creux — DFFC</text>
+        </svg>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Double jet croisé. Bonne couverture face inférieure des feuilles. Usage viti jet porté.</div>
+        <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+          <span class="mini-tag mt-yellow">3–10 bar</span>
+          <span class="mini-tag mt-yellow">Face inférieure ++</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goStep(1)">← Retour</button>
+    <button class="btn btn-main" id="btn2next" disabled onclick="goStep(3)">Paramètres de réglage →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ SCREEN 3: RÉGLAGES ═══════════════ -->
+<div class="screen" id="screen3">
+  <div class="context-banner">
+    <div class="context-icon">🚜</div>
+    <div class="context-item" id="ctx2-pulve">—</div>
+    <div style="width:1px;height:20px;background:rgba(74,124,63,.2);"></div>
+    <div class="context-icon">🔩</div>
+    <div class="context-item" id="ctx2-buse">—</div>
+    <div style="width:1px;height:20px;background:rgba(74,124,63,.2);"></div>
+    <div class="context-icon" id="ctx2-iso-dot" style="width:18px;height:18px;border-radius:50%;background:#ccc;border:2px solid rgba(0,0,0,.1);font-size:0;"></div>
+    <div class="context-item" id="ctx2-calibre">—</div>
+  </div>
+
+  <div class="score-banner">
+    <div class="score-circle-wrap">
+      <svg width="78" height="78" viewBox="0 0 78 78">
+        <circle class="score-circle-bg" cx="39" cy="39" r="32"/>
+        <circle class="score-circle-fill" id="circFill" cx="39" cy="39" r="32"/>
+      </svg>
+      <div class="score-text-wrap">
+        <div class="score-pct" id="scorePct">—</div>
+        <div class="score-lbl">score</div>
+      </div>
+    </div>
+    <div class="score-info">
+      <div class="score-title">État du pulvérisateur</div>
+      <div class="score-desc" id="scoreDesc">Renseignez les paramètres pour évaluation.</div>
+    </div>
+    <div class="score-badge badge-wait" id="scoreBadge">En attente</div>
+  </div>
+
+  <div class="section-title" style="margin-bottom:12px">10 paramètres de réglage</div>
+  <div class="param-grid">
+
+    <!-- 1 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-brown">🔧</div><div>
+          <div class="card-num">01 — Entretien</div>
+          <div class="card-title">État du pulvérisateur</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge1">—</div>
+      </div>
+      <label class="field-label">Dernier entretien</label>
+      <select id="etat_entretien" onchange="evaluerTout()">
+        <option value="">— sélectionner —</option>
+        <option value="3">Cette saison</option>
+        <option value="2">Saison passée</option>
+        <option value="1">Il y a 2 ans ou plus</option>
+      </select>
+      <div class="mt10"><label class="field-label">Fuites</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="fuites" data-val="ok" onclick="toggleBtn(this)">✓ Aucune</button>
+          <button class="tog warn" data-group="fuites" data-val="warn" onclick="toggleBtn(this)">⚠ Petite</button>
+          <button class="tog bad" data-group="fuites" data-val="bad" onclick="toggleBtn(this)">✗ Majeure</button>
+        </div>
+      </div>
+      <div class="mt10"><label class="field-label">Filtres</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="filtres" data-val="ok" onclick="toggleBtn(this)">✓ Propres</button>
+          <button class="tog warn" data-group="filtres" data-val="warn" onclick="toggleBtn(this)">⚠ À rincer</button>
+          <button class="tog bad" data-group="filtres" data-val="bad" onclick="toggleBtn(this)">✗ Colmatés</button>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert1">✗ Intervention nécessaire avant traitement</div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-blue">🔩</div><div>
+          <div class="card-num">02 — Buses</div>
+          <div class="card-title">Usure des buses</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge2">—</div>
+      </div>
+      <label class="field-label">Usure (écart débit mesuré)</label>
+      <div class="toggle-group">
+        <button class="tog ok active" data-group="usure" data-val="ok" onclick="toggleBtn(this)">&lt; 10%</button>
+        <button class="tog warn" data-group="usure" data-val="warn" onclick="toggleBtn(this)">10–20%</button>
+        <button class="tog bad" data-group="usure" data-val="bad" onclick="toggleBtn(this)">&gt; 20%</button>
+      </div>
+      <div class="mt10"><label class="field-label">Uniformité du jet</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="jet" data-val="ok" onclick="toggleBtn(this)">✓ Uniforme</button>
+          <button class="tog warn" data-group="jet" data-val="warn" onclick="toggleBtn(this)">⚠ Irrégulier</button>
+          <button class="tog bad" data-group="jet" data-val="bad" onclick="toggleBtn(this)">✗ Bouchée</button>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert2">⚠ Remplacement recommandé (écart &gt; 20%)</div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-orange">📊</div><div>
+          <div class="card-num">03 — Pression</div>
+          <div class="card-title">Pression de travail</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge3">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Pression (bar)</label>
+        <div class="range-val" id="pression_val">3.0 bar</div>
+      </div>
+      <input type="range" id="pression" min="0.5" max="15" step="0.5" value="3" oninput="syncRange('pression','pression_val','bar',1);evaluerTout()">
+      <div class="gauge-track"><div class="gauge-fill" id="pression_gauge" style="width:17%"></div></div>
+      <div class="mt10"><label class="field-label">Plage recommandée</label>
+        <select id="pression_plage" onchange="evaluerTout()">
+          <option value="low">0.5–1.5 bar — anti-dérive basse pression</option>
+          <option value="mid" selected>1.5–4 bar — jet porté standard</option>
+          <option value="high">4–8 bar — buses à turbulence ATR</option>
+          <option value="vhigh">8–15 bar — haute pression viti</option>
+        </select>
+      </div>
+      <div class="alert-strip" id="alert3">⚠ Pression hors plage pour ce type de buse</div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-green">🚜</div><div>
+          <div class="card-num">04 — Vitesse</div>
+          <div class="card-title">Vitesse d'avancement</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge4">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Vitesse (km/h)</label>
+        <div class="range-val" id="vitesse_val">6.0 km/h</div>
+      </div>
+      <input type="range" id="vitesse" min="1" max="14" step="0.5" value="6" oninput="syncRange('vitesse','vitesse_val','km/h',1);calcVolumeHa();evaluerTout()">
+      <div class="gauge-track"><div class="gauge-fill" id="vitesse_gauge"></div></div>
+      <div class="mt10"><label class="field-label">Régularité</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="regulvit" data-val="ok" onclick="toggleBtn(this)">Constante</button>
+          <button class="tog warn" data-group="regulvit" data-val="warn" onclick="toggleBtn(this)">Variable ±1</button>
+          <button class="tog bad" data-group="regulvit" data-val="bad" onclick="toggleBtn(this)">Très variable</button>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert4">⚠ Hors plage optimale (6–10 km/h)</div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-blue">💧</div><div>
+          <div class="card-num">05 — Dose</div>
+          <div class="card-title">Volume / ha</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge5">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Débit buse (L/min)</label>
+        <div class="range-val" id="debit_val">0.80 L/min</div>
+      </div>
+      <input type="range" id="debit_buse" min="0.2" max="3.5" step="0.05" value="0.8" oninput="syncRange('debit_buse','debit_val','L/min',2);calcVolumeHa()">
+      <div class="mt10"><label class="field-label">Nombre de buses</label>
+        <select id="nb_buses" onchange="calcVolumeHa()">
+          <option value="4">4 buses</option><option value="6">6 buses</option>
+          <option value="8" selected>8 buses</option><option value="10">10 buses</option>
+          <option value="12">12 buses</option><option value="16">16 buses</option><option value="20">20 buses</option>
+        </select>
+      </div>
+      <div class="result-box" id="vol_box">
+        <div><div class="result-label">Volume calculé</div><div class="result-note">débit×buses×600÷largeur÷vitesse</div></div>
+        <div style="display:flex;align-items:baseline;gap:3px">
+          <div class="result-num" id="volumeha_val">—</div>
+          <div class="result-unit">L/ha</div>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert5">⚠ Dose hors cible (80–250 L/ha)</div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-green" style="font-size:18px;font-weight:700;font-family:monospace;">↔</div><div>
+          <div class="card-num">06 — Largeur</div>
+          <div class="card-title">Largeur traitée</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge6">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Largeur (m)</label>
+        <div class="range-val" id="largeur_val">6.0 m</div>
+      </div>
+      <input type="range" id="largeur" min="1" max="24" step="0.5" value="6" oninput="syncRange('largeur','largeur_val','m',1);calcVolumeHa();evaluerTout()">
+      <div class="gauge-track"><div class="gauge-fill" id="largeur_gauge" style="background:var(--green);width:21%"></div></div>
+      <div class="mt10"><label class="field-label">Recouvrement des jets</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="recouv" data-val="ok" onclick="toggleBtn(this)">Optimal ≈10%</button>
+          <button class="tog warn" data-group="recouv" data-val="warn" onclick="toggleBtn(this)">⚠ Insuffisant</button>
+          <button class="tog bad" data-group="recouv" data-val="bad" onclick="toggleBtn(this)">✗ Lacune/excès</button>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert6">⚠ Recouvrement à corriger — hauteur rampe</div>
+    </div>
+
+    <!-- 7 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-orange">🌀</div><div>
+          <div class="card-num">07 — Flux d'air</div>
+          <div class="card-title">Ventilation</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge7">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Intensité ventilateur</label>
+        <div class="range-val" id="air_val">Moyen</div>
+      </div>
+      <input type="range" id="air_flux" min="1" max="5" step="1" value="3" oninput="updateAir();evaluerTout()">
+      <div class="mt10"><label class="field-label">Pénétration végétation</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="penetre" data-val="ok" onclick="toggleBtn(this)">✓ Bonne</button>
+          <button class="tog warn" data-group="penetre" data-val="warn" onclick="toggleBtn(this)">⚠ Surfacique</button>
+          <button class="tog bad" data-group="penetre" data-val="bad" onclick="toggleBtn(this)">✗ Dérive forte</button>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert7">⚠ Flux à ajuster selon stade végétatif</div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-brown">🎯</div><div>
+          <div class="card-num">08 — Orientation</div>
+          <div class="card-title">Orientation des buses</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge8">—</div>
+      </div>
+      <label class="field-label">Angle des buses</label>
+      <div class="toggle-group">
+        <button class="tog ok active" data-group="angle" data-val="ok" onclick="toggleBtn(this)">↘ Vers le bas</button>
+        <button class="tog warn" data-group="angle" data-val="warn" onclick="toggleBtn(this)">→ Horizontal</button>
+        <button class="tog bad" data-group="angle" data-val="bad" onclick="toggleBtn(this)">↗ Vers le haut</button>
+      </div>
+      <div class="mt10"><label class="field-label">Hauteur de rampe</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="hauteur" data-val="ok" onclick="toggleBtn(this)">✓ Correcte</button>
+          <button class="tog warn" data-group="hauteur" data-val="warn" onclick="toggleBtn(this)">↑ Trop haute</button>
+          <button class="tog bad" data-group="hauteur" data-val="bad" onclick="toggleBtn(this)">↓ Trop basse</button>
+        </div>
+      </div>
+      <div class="mt10"><label class="field-label">Alignement rampe/rang</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="align" data-val="ok" onclick="toggleBtn(this)">✓ Aligné</button>
+          <button class="tog warn" data-group="align" data-val="warn" onclick="toggleBtn(this)">⚠ Décalé</button>
+          <button class="tog bad" data-group="align" data-val="bad" onclick="toggleBtn(this)">✗ Désaligné</button>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert8">⚠ Risque de dérive ou mauvaise couverture</div>
+    </div>
+
+    <!-- 9 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-green">⚖️</div><div>
+          <div class="card-num">09 — Répartition</div>
+          <div class="card-title">Droite / Gauche</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge9">—</div>
+      </div>
+      <div class="range-row" style="margin-bottom:3px">
+        <label class="field-label" style="margin:0">Équilibre D/G</label>
+        <div class="range-val" id="repartition_val">50/50</div>
+      </div>
+      <input type="range" id="repartition" min="30" max="70" step="1" value="50" oninput="updateRepartition();evaluerTout()">
+      <div class="split-visual">
+        <span class="split-num" id="lbl_left" style="color:var(--green)">G 50%</span>
+        <div class="split-bar"><div class="split-l" id="split_l" style="width:50%"></div><div class="split-r" id="split_r" style="width:50%"></div></div>
+        <span class="split-num" id="lbl_right" style="color:var(--orange)">50% D</span>
+      </div>
+      <div class="alert-strip" id="alert9">⚠ Déséquilibre &gt;10% — vérifier manomètres</div>
+    </div>
+
+    <!-- 10 -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-blue">🌤</div><div>
+          <div class="card-num">10 — Météo</div>
+          <div class="card-title">Conditions météo</div>
+        </div></div>
+        <div class="status-pill pill-na" id="badge10">—</div>
+      </div>
+      <div class="meteo-grid">
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌬 Vent</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input type="number" id="vent" min="0" max="60" value="8" oninput="evaluerTout()">
+            <span class="meteo-unit">km/h</span>
+          </div>
+        </div>
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌡 Température</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input type="number" id="temperature" min="-5" max="45" value="20" oninput="evaluerTout()">
+            <span class="meteo-unit">°C</span>
+          </div>
+        </div>
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">💧 Hygrométrie</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input type="number" id="hygro" min="0" max="100" value="60" oninput="evaluerTout()">
+            <span class="meteo-unit">%</span>
+          </div>
+        </div>
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌧 Pluie récente</div>
+          <select id="pluie" onchange="evaluerTout()" style="font-size:12px;margin-top:4px">
+            <option value="ok">Non</option>
+            <option value="warn">6–24 h</option>
+            <option value="bad">&lt; 6 h</option>
+          </select>
+        </div>
+      </div>
+      <div class="alert-strip" id="alert10"></div>
+    </div>
+
+  </div>
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="goStep(2)">← Retour</button>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-ghost" onclick="resetAll()">↺ Réinitialiser</button>
+      <button class="btn btn-main" onclick="exportResume()">⬇ Exporter</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+const state = {
+  fuites:'ok',filtres:'ok',usure:'ok',jet:'ok',
+  regulvit:'ok',recouv:'ok',penetre:'ok',
+  angle:'ok',hauteur:'ok',align:'ok'
+};
+let selectedPulve = null, selectedBuseType = null, selectedISO = null;
+
+// ── INIT ──
+window.onload = () => {
+  tick(); setInterval(tick,1000);
+  buildAbaqueTable();
+  syncRange('pression','pression_val','bar',1);
+  syncRange('vitesse','vitesse_val','km/h',1);
+  syncRange('largeur','largeur_val','m',1);
+  syncRange('debit_buse','debit_val','L/min',2);
+  updateAir(); updateRepartition(); evaluerTout();
+};
+
+function tick(){ document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR'); }
+
+// ── STEP NAV ──
+function goStep(n){
+  if(n===2 && !selectedPulve) return;
+  if(n===3 && (!selectedPulve)) return;
+  [1,2,3].forEach(i=>{
+    const el = document.getElementById('screen'+i), sn = document.getElementById('sn'+i);
+    el.classList.toggle('active', i===n);
+    sn.className = 'step ' + (i===n ? 'active' : i<n ? 'done' : 'inactive');
+  });
+  if(n===3) updateContextBanner();
+  window.scrollTo(0,0);
+}
+
+// ── STEP 1: SELECT PULVÉ ──
+function selectPulve(card, id, name){
+  document.querySelectorAll('.pulve-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedPulve = {id, name, cat: card.dataset.cat};
+  document.getElementById('btn1next').disabled = false;
+  document.getElementById('ctx-pulve-name').textContent = '🚜 ' + name;
+  buildTypeBuses();
+  // afficher/cacher pastilles
+  const isPneu = card.dataset.cat === 'pneumatique';
+  document.getElementById('pastille-section').style.display = isPneu ? 'block' : 'none';
+  // adapter plage pression suggérée
+  if(id.includes('aeroc')){
+    document.getElementById('pression_plage').value='high';
+  } else if(id.includes('jp')||id.includes('panneau')){
+    document.getElementById('pression_plage').value='mid';
+  }
+}
+
+// ── STEP 2: BUSES ──
+const busesParType = {
+  'fpf-jp':   ['jet-porte-fente','ai-avi','ai-idk','miroir'],
+  'fpf-pn':   ['turbulence-atr','turbulence-tvi'],
+  'voute-pn': ['pastille','turbulence-atr'],
+  'voute-jp': ['jet-porte-fente','ai-avi','ai-idk'],
+  'panneau-jp':['ai-avi','ai-idk','jet-porte-fente'],
+  'aeroc':    ['turbulence-atr','turbulence-tvi','diffuseur'],
+};
+
+const busesDefs = {
+  'jet-porte-fente': {
+    nom:'Fente plate classique (APE / AXI)',
+    info:'Jet plat uniforme 80° ou 110°. Bon pour jet porté faces et panneaux.',
+    tags:['Jet porté','1–5 bar','80°–110°'],
+    tagColors:['mt-green','mt-green','mt-yellow'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="75" y="2" width="30" height="14" rx="3" fill="#c4a882"/>
+      <rect x="78" y="16" width="24" height="5" rx="2" fill="#9c8370"/>
+      <path d="M80 21 L20 55" stroke="#4a7c3f" stroke-width="2" fill="none"/>
+      <path d="M100 21 L160 55" stroke="#4a7c3f" stroke-width="2" fill="none"/>
+      <path d="M80 21 L20 55 L160 55 L100 21 Z" fill="#4a7c3f" fill-opacity=".1"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">Jet plat — 80°/110°</text>
+    </svg>`
+  },
+  'ai-avi': {
+    nom:'Injection d\'air — AVI / CVI (Albuz)',
+    info:'Anti-dérive. Grosses gouttes. ZNT réduit. Recommandée panneaux récup. et face par face.',
+    tags:['Anti-dérive','ZNT ✓','3–8 bar'],
+    tagColors:['mt-green','mt-green','mt-orange'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="70" y="2" width="40" height="14" rx="3" fill="#c4a882"/>
+      <circle cx="74" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+      <circle cx="106" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+      <text x="74" y="11" text-anchor="middle" font-size="6" fill="#c8621a">air</text>
+      <text x="106" y="11" text-anchor="middle" font-size="6" fill="#c8621a">air</text>
+      <rect x="74" y="16" width="32" height="5" rx="2" fill="#9c8370"/>
+      <path d="M78 21 L25 55" stroke="#9b59b6" stroke-width="2" fill="none"/>
+      <path d="M102 21 L155 55" stroke="#9b59b6" stroke-width="2" fill="none"/>
+      <circle cx="30" cy="52" r="4" fill="#9b59b6" opacity=".5"/>
+      <circle cx="150" cy="52" r="4" fill="#9b59b6" opacity=".5"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">Grosses gouttes anti-dérive</text>
+    </svg>`
+  },
+  'ai-idk': {
+    nom:'Injection d\'air — IDK / IDKT (Lechler)',
+    info:'Jet plat à injection d\'air. Anti-dérive. ZNT. Résiste au bouchage. Excellente pour panneaux.',
+    tags:['Anti-dérive','ZNT ✓','5–10 bar'],
+    tagColors:['mt-green','mt-green','mt-orange'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="65" y="2" width="50" height="14" rx="3" fill="#c4a882"/>
+      <circle cx="70" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+      <circle cx="110" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+      <text x="70" y="11" text-anchor="middle" font-size="6" fill="#c8621a">air</text>
+      <text x="110" y="11" text-anchor="middle" font-size="6" fill="#c8621a">air</text>
+      <rect x="70" y="16" width="40" height="5" rx="2" fill="#7a5c46"/>
+      <path d="M74 21 L20 55" stroke="#2470c8" stroke-width="2.5" fill="none"/>
+      <path d="M106 21 L160 55" stroke="#2470c8" stroke-width="2.5" fill="none"/>
+      <circle cx="25" cy="52" r="5" fill="#2470c8" opacity=".4"/>
+      <circle cx="155" cy="52" r="5" fill="#2470c8" opacity=".4"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">IDK — jet plat injection air</text>
+    </svg>`
+  },
+  'turbulence-atr': {
+    nom:'Turbulence conique — ATR (Albuz)',
+    info:'Jet conique creux. Très fines gouttelettes. Excellente pénétration. Usage viti/arbo à haute pression.',
+    tags:['Jet conique','5–15 bar','Pénétration ++'],
+    tagColors:['mt-orange','mt-orange','mt-yellow'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="80" y="2" width="20" height="14" rx="3" fill="#c4a882"/>
+      <circle cx="90" cy="18" r="5" fill="#9c8370"/>
+      <path d="M85 23 Q60 45 35 56" stroke="#2470c8" stroke-width="2.5" fill="none"/>
+      <path d="M95 23 Q120 45 145 56" stroke="#2470c8" stroke-width="2.5" fill="none"/>
+      <path d="M85 23 Q60 45 35 56 Q90 50 145 56 Q120 45 95 23 Z" fill="#2470c8" fill-opacity=".07"/>
+      <circle cx="38" cy="55" r="2" fill="#2470c8" opacity=".5"/>
+      <circle cx="60" cy="50" r="1.5" fill="#2470c8" opacity=".4"/>
+      <circle cx="142" cy="55" r="2" fill="#2470c8" opacity=".5"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">Conique creux — gouttes très fines</text>
+    </svg>`
+  },
+  'turbulence-tvi': {
+    nom:'Turbulence anti-dérive — TVI (Albuz)',
+    info:'Jet conique avec injection d\'air. Anti-dérive. Meilleure alternative à l\'ATR en ZNT.',
+    tags:['Conique AI','Anti-dérive','5–10 bar'],
+    tagColors:['mt-orange','mt-green','mt-orange'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="76" y="2" width="28" height="14" rx="3" fill="#c4a882"/>
+      <circle cx="80" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+      <circle cx="100" cy="9" r="4" fill="none" stroke="#c8621a" stroke-width="1.5"/>
+      <circle cx="90" cy="18" r="5" fill="#9c8370"/>
+      <path d="M85 23 Q62 44 38 54" stroke="#9b59b6" stroke-width="2.5" fill="none"/>
+      <path d="M95 23 Q118 44 142 54" stroke="#9b59b6" stroke-width="2.5" fill="none"/>
+      <circle cx="42" cy="53" r="4" fill="#9b59b6" opacity=".4"/>
+      <circle cx="138" cy="53" r="4" fill="#9b59b6" opacity=".4"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">TVI — conique + injection d'air</text>
+    </svg>`
+  },
+  'miroir': {
+    nom:'Buse miroir / double jet croisé',
+    info:'Double jet croisé. Bonne couverture face inférieure. Usage jet porté face par face.',
+    tags:['Double jet','3–10 bar','Face inférieure ++'],
+    tagColors:['mt-yellow','mt-yellow','mt-yellow'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="78" y="2" width="24" height="14" rx="3" fill="#c4a882"/>
+      <rect x="82" y="16" width="16" height="5" rx="2" fill="#9c8370"/>
+      <path d="M84 21 L40 54" stroke="#d4a017" stroke-width="2.5" fill="none"/>
+      <path d="M96 21 L140 54" stroke="#d4a017" stroke-width="2.5" fill="none"/>
+      <path d="M84 21 L58 52" stroke="#d4a017" stroke-width="2" fill="none" opacity=".5"/>
+      <path d="M96 21 L122 52" stroke="#d4a017" stroke-width="2" fill="none" opacity=".5"/>
+      <ellipse cx="90" cy="54" rx="35" ry="4" fill="#d4a017" fill-opacity=".12"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">Double jet — faces inf. des feuilles</text>
+    </svg>`
+  },
+  'diffuseur': {
+    nom:'Diffuseur orientable (aéroconvecteur)',
+    info:'Diffuseurs réglables en azimut. Orienter vers la végétation. Fermer les diffuseurs inutiles en début de saison.',
+    tags:['Orientable','Fermeture partielle','1–6 bar'],
+    tagColors:['mt-yellow','mt-green','mt-yellow'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <rect x="80" y="2" width="40" height="20" rx="4" fill="#e0c898"/>
+      <circle cx="100" cy="12" r="8" fill="none" stroke="#d4a017" stroke-width="2"/>
+      <line x1="100" y1="4" x2="99" y2="8" stroke="#d4a017" stroke-width="1.5"/>
+      <line x1="100" y1="16" x2="101" y2="20" stroke="#d4a017" stroke-width="1.5"/>
+      <line x1="92" y1="12" x2="96" y2="11" stroke="#d4a017" stroke-width="1.5"/>
+      <line x1="108" y1="12" x2="104" y2="13" stroke="#d4a017" stroke-width="1.5"/>
+      <!-- Jet diffusé large -->
+      <path d="M80 22 L20 52" stroke="#d4a017" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+      <path d="M80 22 L35 58" stroke="#d4a017" stroke-width="1.5" fill="none" stroke-dasharray="2,2" opacity=".6"/>
+      <path d="M120 22 L160 52" stroke="#d4a017" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+      <path d="M120 22 L145 58" stroke="#d4a017" stroke-width="1.5" fill="none" stroke-dasharray="2,2" opacity=".6"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">Diffuseur — orienter vers végétation</text>
+    </svg>`
+  },
+  'pastille': {
+    nom:'Pastille de calibrage (voûte pneumatique)',
+    info:'Insert calibré en amont des canons. Choisir selon débit cible. Couleurs variables selon constructeur.',
+    tags:['Voûte pneumatique','Calibrage débit','Constructeur-dépendant'],
+    tagColors:['mt-orange','mt-yellow','mt-red'],
+    svg: `<svg width="100%" height="60" viewBox="0 0 180 60">
+      <circle cx="90" cy="22" r="18" fill="#c4a882"/>
+      <circle cx="90" cy="22" r="10" fill="#d4a017"/>
+      <circle cx="90" cy="22" r="5" fill="#9c8370"/>
+      <text x="90" y="26" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">ø</text>
+      <path d="M90 40 L60 58" stroke="#c8621a" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+      <path d="M90 40 L120 58" stroke="#c8621a" stroke-width="2" fill="none" stroke-dasharray="3,2"/>
+      <text x="90" y="58" text-anchor="middle" font-size="9" fill="#9c8370">Pastille — calibre selon constructeur</text>
+    </svg>`
+  },
+};
+
+function buildTypeBuses(){
+  if(!selectedPulve) return;
+  const grid = document.getElementById('type-buse-grid');
+  const types = busesParType[selectedPulve.id] || ['jet-porte-fente','turbulence-atr'];
+  grid.innerHTML = types.map(t=>{
+    const d = busesDefs[t];
+    if(!d) return '';
+    const tagsHtml = d.tags.map((tag,i)=>`<span class="mini-tag ${d.tagColors[i]}">${tag}</span>`).join('');
+    return `<div class="type-buse-card" onclick="selectBuseType(this,'${t}','${d.nom}')">
+      <div class="type-buse-svg">${d.svg}</div>
+      <div class="type-buse-name">${d.nom}</div>
+      <div class="type-buse-info">${d.info}</div>
+      <div class="type-buse-tags">${tagsHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectBuseType(card, id, name){
+  document.querySelectorAll('.type-buse-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedBuseType = {id, name};
+  checkBuseComplete();
+}
+
+function selectISO(card, calibre, couleur, debit, goutte, goutteLong){
+  document.querySelectorAll('.iso-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  card.style.borderColor = card.style.borderColor;
+  selectedISO = {calibre, couleur, debit, goutte, goutteLong};
+  document.getElementById('abaque-selected-label').textContent = `— Calibre ${calibre} (${couleur}) sélectionné`;
+  highlightAbaqueRow(calibre);
+  // Mettre à jour le débit buse dans step 3
+  document.getElementById('debit_buse').value = parseFloat(debit);
+  syncRange('debit_buse','debit_val','L/min',2);
+  calcVolumeHa();
+  checkBuseComplete();
+}
+
+function selectPastille(card, couleur, debitMin, debitMax){
+  document.querySelectorAll('.pastille-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  const mid = (parseFloat(debitMin)+parseFloat(debitMax))/2;
+  document.getElementById('debit_buse').value = mid;
+  syncRange('debit_buse','debit_val','L/min',2);
+  calcVolumeHa();
+  checkBuseComplete();
+}
+
+function checkBuseComplete(){
+  const ok = selectedBuseType && (selectedISO || selectedPulve.cat === 'pneumatique');
+  document.getElementById('btn2next').disabled = !ok;
+}
+
+// ── ABAQUE TABLE ──
+const isoData = [
+  {cal:'01',color:'#e07820',hexLabel:'Orange',debits:[0.23,0.33,0.40,0.46,0.52,0.57,0.65],goutte:'TF'},
+  {cal:'015',color:'#2d8a3e',hexLabel:'Vert',debits:[0.35,0.49,0.60,0.69,0.77,0.85,0.97],goutte:'F'},
+  {cal:'02',color:'#d4a017',hexLabel:'Jaune',debits:[0.46,0.65,0.80,0.92,1.03,1.13,1.30],goutte:'M'},
+  {cal:'025',color:'#9b59b6',hexLabel:'Lilas',debits:[0.58,0.82,1.00,1.15,1.29,1.41,1.63],goutte:'M'},
+  {cal:'03',color:'#2470c8',hexLabel:'Bleu',debits:[0.69,0.98,1.20,1.38,1.55,1.70,1.96],goutte:'G'},
+  {cal:'04',color:'#b53a2a',hexLabel:'Rouge',debits:[0.92,1.31,1.60,1.85,2.07,2.26,2.61],goutte:'G'},
+  {cal:'05',color:'#7a5c46',hexLabel:'Marron',debits:[1.15,1.63,2.00,2.31,2.58,2.83,3.27],goutte:'TG'},
+  {cal:'06',color:'#7a8c8a',hexLabel:'Gris',debits:[1.38,1.96,2.40,2.77,3.10,3.39,3.92],goutte:'TG'},
+];
+
+const pLabels = ['1 bar','2 bar','3 bar ✓','4 bar','5 bar','6 bar','8 bar'];
+
+function buildAbaqueTable(){
+  const tbody = document.getElementById('abaque-body');
+  tbody.innerHTML = isoData.map(row=>`
+    <tr id="arow-${row.cal}">
+      <td><b>${row.cal}</b></td>
+      <td><span class="color-swatch" style="background:${row.color}"></span>${row.hexLabel}</td>
+      ${row.debits.map((d,i)=>`<td style="${i===2?'font-weight:700;color:var(--green);':''}${i>4?'color:var(--muted);':''}">${d.toFixed(2)}</td>`).join('')}
+      <td><span style="font-size:10px;font-weight:600;padding:2px 5px;border-radius:5px;background:${row.goutte==='TF'||row.goutte==='F'?'#fde':'#e8f2e5'};color:${row.goutte==='TF'||row.goutte==='F'?'#c00':'#2a6'}">${row.goutte}</span></td>
+    </tr>`).join('');
+}
+
+function highlightAbaqueRow(cal){
+  document.querySelectorAll('.abaque-table tr').forEach(r=>r.classList.remove('highlighted'));
+  const row = document.getElementById('arow-'+cal);
+  if(row) row.classList.add('highlighted');
+}
+
+// ── CONTEXT BANNER ──
+function updateContextBanner(){
+  if(selectedPulve) document.getElementById('ctx2-pulve').textContent = selectedPulve.name;
+  if(selectedBuseType) document.getElementById('ctx2-buse').textContent = selectedBuseType.name.split('—')[0].trim();
+  if(selectedISO){
+    document.getElementById('ctx2-calibre').textContent = 'Calibre '+selectedISO.calibre+' — '+selectedISO.debit+' L/min';
+    const dot = document.getElementById('ctx2-iso-dot');
+    const iso = isoData.find(r=>r.cal===selectedISO.calibre);
+    if(iso) dot.style.background = iso.color;
+  }
+}
+
+// ── STEP 3 LOGIC ──
+function syncRange(id,disp,unit,dec){
+  document.getElementById(disp).textContent = parseFloat(document.getElementById(id).value).toFixed(dec)+' '+unit;
+}
+function updateAir(){
+  const labels=['','Très faible','Faible','Moyen','Fort','Très fort'];
+  document.getElementById('air_val').textContent = labels[+document.getElementById('air_flux').value];
+}
+function updateRepartition(){
+  const v=+document.getElementById('repartition').value, r=100-v;
+  document.getElementById('repartition_val').textContent=v+'/'+r;
+  document.getElementById('split_l').style.width=v+'%';
+  document.getElementById('split_r').style.width=r+'%';
+  document.getElementById('lbl_left').textContent='G '+v+'%';
+  document.getElementById('lbl_right').textContent=r+'% D';
+}
+function toggleBtn(btn){
+  const g=btn.dataset.group;
+  document.querySelectorAll('[data-group="'+g+'"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state[g]=btn.dataset.val;
+  evaluerTout();
+}
+function calcVolumeHa(){
+  const debit=+document.getElementById('debit_buse').value;
+  const nb=+document.getElementById('nb_buses').value;
+  const vit=+document.getElementById('vitesse').value;
+  const larg=+document.getElementById('largeur').value;
+  if(vit>0&&larg>0){
+    const vol=(debit*nb*600)/(larg*vit);
+    document.getElementById('volumeha_val').textContent=Math.round(vol);
+    const box=document.getElementById('vol_box');
+    const num=document.querySelector('#vol_box .result-num');
+    if(vol<80||vol>350){box.className='result-box bad';num.style.color='var(--red)';}
+    else if(vol<100||vol>250){box.className='result-box warn';num.style.color='var(--orange)';}
+    else{box.className='result-box';num.style.color='var(--green)';}
+  }
+  evaluerTout();
+}
+
+function sc1(){let s=(document.getElementById('etat_entretien').value==='3'?1:document.getElementById('etat_entretien').value==='2'?0.5:0)+(state.fuites==='ok'?1:state.fuites==='warn'?0.5:0)+(state.filtres==='ok'?1:state.filtres==='warn'?0.5:0);return{s:s/3,alert:state.fuites==='bad'||state.filtres==='bad'};}
+function sc2(){const t=1;let s=t+(state.usure==='ok'?1:state.usure==='warn'?0.5:0)+(state.jet==='ok'?1:state.jet==='warn'?0.5:0);return{s:s/3,alert:state.usure==='bad'||state.jet==='bad'};}
+function sc3(){const p=+document.getElementById('pression').value,pl=document.getElementById('pression_plage').value;const ok=pl==='low'?(p>=0.5&&p<=1.5):pl==='mid'?(p>=1.5&&p<=4):pl==='high'?(p>=4&&p<=8):(p>=8&&p<=15);const g=document.getElementById('pression_gauge');g.style.width=((p-0.5)/14.5*100)+'%';g.style.background=ok?'var(--green)':'var(--red)';return{s:ok?1:0.35,alert:!ok};}
+function sc4(){const v=+document.getElementById('vitesse').value;const ok=v>=6&&v<=10,warn=(v>=4&&v<6)||(v>10&&v<=12);const g=document.getElementById('vitesse_gauge');g.style.width=((v-1)/13*100)+'%';g.style.background=ok?'var(--green)':warn?'var(--yellow)':'var(--red)';let s=ok?1:warn?0.55:0.2;if(state.regulvit==='warn')s=Math.min(s,0.65);if(state.regulvit==='bad')s=Math.min(s,0.3);return{s,alert:v<4||v>12};}
+function sc5(){const d=+document.getElementById('debit_buse').value,nb=+document.getElementById('nb_buses').value,v=+document.getElementById('vitesse').value,l=+document.getElementById('largeur').value;const vol=(d*nb*600)/(l*v);const ok=vol>=100&&vol<=250,warn=(vol>=80&&vol<100)||(vol>250&&vol<=350);return{s:ok?1:warn?0.6:0.2,alert:!ok&&!warn};}
+function sc6(){const l=+document.getElementById('largeur').value;const g=document.getElementById('largeur_gauge');g.style.width=((l-1)/23*100)+'%';g.style.background='var(--green)';return{s:state.recouv==='ok'?1:state.recouv==='warn'?0.6:0.2,alert:state.recouv==='bad'};}
+function sc7(){const air=+document.getElementById('air_flux').value;let s=1;if(air<2||air>4)s=0.4;else if(air===2||air===4)s=0.7;if(state.penetre==='warn')s=Math.min(s,0.6);if(state.penetre==='bad')s=Math.min(s,0.2);return{s,alert:state.penetre==='bad'};}
+function sc8(){let s=1;[[state.angle,0.6,0.1],[state.hauteur,0.7,0.3],[state.align,0.7,0.3]].forEach(([v,w,b])=>{if(v==='warn')s=Math.min(s,w);if(v==='bad')s=Math.min(s,b);});return{s,alert:state.angle==='bad'||state.hauteur==='bad'};}
+function sc9(){const diff=Math.abs(+document.getElementById('repartition').value-50);return{s:diff<=5?1:diff<=10?0.7:diff<=20?0.4:0.1,alert:diff>10};}
+function sc10(){const vent=+document.getElementById('vent').value||0,temp=+document.getElementById('temperature').value||20,hygro=+document.getElementById('hygro').value||50,pluie=document.getElementById('pluie').value;let s=1,msg='';if(vent>19){s=0;msg='🛑 Traitement interdit — vent > 19 km/h';}else if(vent>15){s=Math.min(s,0.3);msg+='⚠ Vent fort — dérive élevée\n';}else if(vent>10){s=Math.min(s,0.6);msg+='⚠ Vent modéré — surveiller la dérive\n';}if(temp>30){s=Math.min(s,0.5);msg+='⚠ Température > 30°C — évaporation rapide\n';}if(hygro<40){s=Math.min(s,0.6);msg+='⚠ Hygrométrie < 40% — volatilisation\n';}if(pluie==='bad'){s=0;msg+='🛑 Pluie < 6h — traitement déconseillé';}else if(pluie==='warn'){s=Math.min(s,0.5);msg+='⚠ Pluie récente — lessivage possible';}return{s,alert:s<0.5,msg};}
+
+function setBadge(n,s,showAlert){const p=document.getElementById('badge'+n),al=document.getElementById('alert'+n);if(s>=0.85){p.textContent='✓ OK';p.className='status-pill pill-ok';if(al)al.classList.remove('visible');}else if(s>=0.5){p.textContent='⚠';p.className='status-pill pill-warn';if(al)al.classList.remove('visible');}else{p.textContent='✗';p.className='status-pill pill-bad';if(al&&showAlert)al.classList.add('visible');}}
+
+function evaluerTout(){
+  const R=[sc1(),sc2(),sc3(),sc4(),sc5(),sc6(),sc7(),sc8(),sc9(),sc10()];
+  R.forEach((r,i)=>setBadge(i+1,r.s,r.alert));
+  const a10=document.getElementById('alert10'),m=R[9].msg||'';
+  if(m){a10.textContent=m.trim();a10.classList.add('visible');}else a10.classList.remove('visible');
+  const avg=R.reduce((a,b)=>a+b.s,0)/R.length,pct=Math.round(avg*100);
+  const circumference=220;
+  document.getElementById('circFill').style.strokeDashoffset=circumference-(circumference*avg);
+  document.getElementById('scorePct').textContent=pct+'%';
+  const bd=document.getElementById('scoreBadge'),fill=document.getElementById('circFill');
+  if(pct>=80){fill.style.stroke='var(--green)';bd.textContent='✓ Prêt';bd.className='score-badge badge-ready';document.getElementById('scoreDesc').textContent='Paramètres dans les plages optimales.';}
+  else if(pct>=55){fill.style.stroke='var(--yellow)';bd.textContent='⚠ À revoir';bd.className='score-badge badge-warn-g';document.getElementById('scoreDesc').textContent=R.filter(r=>r.s<0.5).length+' paramètre(s) hors plage.';}
+  else{fill.style.stroke='var(--red)';bd.textContent='✗ Non conforme';bd.className='score-badge badge-nok-g';document.getElementById('scoreDesc').textContent='Corrections nécessaires avant traitement.';}
+}
+
+function resetAll(){
+  document.querySelectorAll('.tog').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tog[data-val="ok"]').forEach(b=>b.classList.add('active'));
+  Object.keys(state).forEach(k=>state[k]='ok');
+  document.getElementById('pression').value=3;
+  document.getElementById('vitesse').value=6;
+  document.getElementById('largeur').value=6;
+  document.getElementById('debit_buse').value=0.8;
+  document.getElementById('air_flux').value=3;
+  document.getElementById('repartition').value=50;
+  document.getElementById('vent').value=8;
+  document.getElementById('temperature').value=20;
+  document.getElementById('hygro').value=60;
+  document.getElementById('pluie').value='ok';
+  document.getElementById('etat_entretien').value='';
+  syncRange('pression','pression_val','bar',1);
+  syncRange('vitesse','vitesse_val','km/h',1);
+  syncRange('largeur','largeur_val','m',1);
+  syncRange('debit_buse','debit_val','L/min',2);
+  updateAir();updateRepartition();evaluerTout();
+}
+
+function exportResume(){
+  const now=new Date().toLocaleString('fr-FR');
+  const pct=document.getElementById('scorePct').textContent;
+  const status=document.getElementById('scoreBadge').textContent;
+  const titres=['État général','Buses','Pression','Vitesse','Volume/ha','Largeur','Flux d\'air','Orientation','Répartition D/G','Conditions météo'];
+  let txt='PULVÉRÉGLAGE — RAPPORT DE RÉGLAGE\n'+'═'.repeat(40)+'\nDate : '+now+'\n';
+  if(selectedPulve) txt+='Appareil : '+selectedPulve.name+'\n';
+  if(selectedBuseType) txt+='Buses : '+selectedBuseType.name+'\n';
+  if(selectedISO) txt+='Calibre : '+selectedISO.calibre+' ('+selectedISO.couleur+') — '+selectedISO.debit+' L/min\n';
+  txt+='\nScore global : '+pct+' — '+status+'\n\n'+'─'.repeat(40)+'\n';
+  for(let i=1;i<=10;i++) txt+=i.toString().padStart(2,'0')+'. '+titres[i-1].padEnd(24)+document.getElementById('badge'+i).textContent+'\n';
+  txt+='\n'+'─'.repeat(40)+'\nVALEURS\n'+'─'.repeat(40)+'\n';
+  txt+='Volume/ha : '+document.getElementById('volumeha_val').textContent+' L/ha\n';
+  txt+='Pression  : '+document.getElementById('pression_val').textContent+'\n';
+  txt+='Vitesse   : '+document.getElementById('vitesse_val').textContent+'\n';
+  txt+='Largeur   : '+document.getElementById('largeur_val').textContent+'\n';
+  txt+='Vent      : '+document.getElementById('vent').value+' km/h\n';
+  txt+='Temp.     : '+document.getElementById('temperature').value+' °C\n';
+  txt+='Hygro.    : '+document.getElementById('hygro').value+' %\n';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  a.download='pulve-rapport-'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
+}
+</script>
+</body>
+</html>
