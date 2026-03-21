@@ -229,6 +229,7 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .context-banner{background:var(--green-pale);border:1.5px solid rgba(74,124,63,.2);border-radius:12px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .context-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);font-weight:500;}
 .context-icon{width:24px;height:24px;background:rgba(74,124,63,.15);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+�/* ONGLETS PRINCIPAUX */�.main-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--card);border-radius:14px;box-shadow:0 2px 10px var(--shadow),0 0 0 1px var(--border);overflow:hidden;}�.main-tab{flex:1;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;border-right:1px solid var(--border);}�.main-tab:last-child{border-right:none;}�.main-tab.active{background:var(--green);color:#fff;}�.main-tab.inactive{background:transparent;color:var(--muted);}�.main-tab-icon{font-size:20px;margin-bottom:3px;}�.main-tab-label{font-size:12px;font-weight:600;letter-spacing:.3px;}�.main-module{display:none;}�.main-module.active{display:block;}�.herb-appareil-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px;}�.herb-card-appareil{background:var(--card);border-radius:16px;border:2px solid var(--border);padding:18px;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px var(--shadow);}�.herb-card-appareil:hover{border-color:var(--orange);box-shadow:0 4px 16px var(--shadow-md);transform:translateY(-2px);}�.herb-card-appareil.selected{border-color:var(--orange);background:var(--orange-pale);}�.herb-sel-ind{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .2s;}�.herb-card-appareil.selected .herb-sel-ind{background:var(--orange);border-color:var(--orange);color:#fff;}�.herb-appareil-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--brown);margin:8px 0 4px;}�.herb-appareil-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;}�.herb-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:8px;background:var(--orange-pale);color:var(--orange);border:1px solid rgba(200,98,26,.2);display:inline-block;margin:2px 2px 0 0;}�.herb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}�.herb-score-banner{background:var(--card);border-radius:16px;padding:18px 22px;margin-bottom:22px;box-shadow:0 2px 12px var(--shadow),0 0 0 1px var(--border);display:flex;align-items:center;gap:18px;flex-wrap:wrap;}�.herb-alert{background:var(--red-pale);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:10px;font-size:11px;color:var(--red);font-weight:500;display:none;}�.herb-alert.visible{display:block;}�.herb-result-box{display:flex;align-items:center;justify-content:space-between;background:var(--orange-pale);border:1.5px solid rgba(200,98,26,.2);border-radius:11px;padding:10px 14px;margin-top:12px;}�.herb-result-num{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--orange);}�
 </style>
 </head>
 <body>
@@ -246,6 +247,21 @@ input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <div class="clock" id="clock">--:--:--</div>
   </div>
 </header>
+
+<!-- ONGLETS PRINCIPAUX -->
+<div class="main-tabs">
+  <div class="main-tab active" id="mt-fongi" onclick="switchModule('fongi')">
+    <div class="main-tab-icon">🍇</div>
+    <div class="main-tab-label">Fongicides</div>
+  </div>
+  <div class="main-tab inactive" id="mt-herb" onclick="switchModule('herb')">
+    <div class="main-tab-icon">🌿</div>
+    <div class="main-tab-label">Herbicides</div>
+  </div>
+</div>
+
+<!-- MODULE FONGICIDES -->
+<div class="main-module active" id="module-fongi">
 
 <!-- STEP NAV -->
 <div class="step-nav">
@@ -1531,6 +1547,622 @@ function exportResume(){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
   a.download='pulve-rapport-'+new Date().toISOString().slice(0,10)+'.txt';
+  a.click();
+}
+</script>
+</div><!-- fin module-fongi -->
+
+<!-- ═══════════════ MODULE HERBICIDES ═══════════════ -->
+<div class="main-module" id="module-herb">
+
+  <!-- SCORE HERBICIDES -->
+  <div class="herb-score-banner">
+    <div class="score-circle-wrap">
+      <svg width="78" height="78" viewBox="0 0 78 78">
+        <circle class="score-circle-bg" cx="39" cy="39" r="32"/>
+        <circle class="score-circle-fill" id="hCircFill" cx="39" cy="39" r="32" style="stroke:var(--orange)"/>
+      </svg>
+      <div class="score-text-wrap">
+        <div class="score-pct" id="hScorePct">—</div>
+        <div class="score-lbl">score</div>
+      </div>
+    </div>
+    <div class="score-info">
+      <div class="score-title">Réglage herbicides</div>
+      <div class="score-desc" id="hScoreDesc">Sélectionnez votre appareil pour commencer.</div>
+    </div>
+    <div class="score-badge badge-wait" id="hScoreBadge">En attente</div>
+  </div>
+
+  <!-- CHOIX APPAREIL -->
+  <div class="section-title" style="margin-bottom:12px">Type d'appareil herbicide</div>
+  <div class="herb-appareil-grid">
+
+    <!-- RAMPE INTERCEP -->
+    <div class="herb-card-appareil" onclick="selectHerbAppareil(this,'intercep','Rampe intercep')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div class="herb-tag">Sous le rang</div>
+        <div class="herb-sel-ind">✓</div>
+      </div>
+      <svg width="100%" height="90" viewBox="0 0 300 90">
+        <!-- Sol -->
+        <rect x="0" y="72" width="300" height="6" rx="2" fill="#c4a882" opacity=".4"/>
+        <!-- Rang vigne gauche -->
+        <rect x="30" y="20" width="16" height="52" rx="4" fill="#4a7c3f" opacity=".7"/>
+        <ellipse cx="38" cy="22" rx="16" ry="12" fill="#5a9a4a" opacity=".6"/>
+        <!-- Rang vigne droite -->
+        <rect x="254" y="20" width="16" height="52" rx="4" fill="#4a7c3f" opacity=".7"/>
+        <ellipse cx="262" cy="22" rx="16" ry="12" fill="#5a9a4a" opacity=".6"/>
+        <!-- Tracteur -->
+        <rect x="118" y="32" width="64" height="38" rx="6" fill="#c4a882"/>
+        <rect x="126" y="24" width="48" height="22" rx="5" fill="#d4b060"/>
+        <rect x="132" y="27" width="36" height="14" rx="3" fill="#a8d4e8" opacity=".8"/>
+        <!-- Roues -->
+        <circle cx="128" cy="70" r="10" fill="#2a2a2a"/>
+        <circle cx="172" cy="70" r="10" fill="#2a2a2a"/>
+        <!-- Bras intercep gauche -->
+        <rect x="48" y="62" width="74" height="6" rx="3" fill="#c8621a"/>
+        <!-- Bras intercep droit -->
+        <rect x="178" y="62" width="74" height="6" rx="3" fill="#c8621a"/>
+        <!-- Buses (2 par côté) -->
+        <circle cx="62" cy="65" r="5" fill="#e87040"/>
+        <circle cx="88" cy="65" r="5" fill="#e87040"/>
+        <circle cx="212" cy="65" r="5" fill="#e87040"/>
+        <circle cx="238" cy="65" r="5" fill="#e87040"/>
+        <!-- Jets vers le bas -->
+        <line x1="62" y1="70" x2="55" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="62" y1="70" x2="62" y2="83" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="62" y1="70" x2="69" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="88" y1="70" x2="81" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="88" y1="70" x2="88" y2="83" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="88" y1="70" x2="95" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="212" y1="70" x2="205" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="212" y1="70" x2="212" y2="83" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="212" y1="70" x2="219" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="238" y1="70" x2="231" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="238" y1="70" x2="238" y2="83" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+        <line x1="238" y1="70" x2="245" y2="82" stroke="#c8621a" stroke-width="2" stroke-dasharray="3,2"/>
+      </svg>
+      <div class="herb-appareil-name">Rampe intercep</div>
+      <div class="herb-appareil-desc">2 à 4 buses par côté. Traitement localisé sous le rang. Dhugues, Berthoud, Caffini, Tecnoma.</div>
+      <div>
+        <span class="herb-tag">2–4 buses/côté</span>
+        <span class="herb-tag">Basse pression</span>
+        <span class="herb-tag">Sous rang</span>
+      </div>
+    </div>
+
+    <!-- ENJAMBEUSE DOUBLE RAMPE -->
+    <div class="herb-card-appareil" onclick="selectHerbAppareil(this,'enjambeuse','Enjambeuse double rampe')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div class="herb-tag">Enjambeuse</div>
+        <div class="herb-sel-ind">✓</div>
+      </div>
+      <svg width="100%" height="90" viewBox="0 0 300 90">
+        <rect x="0" y="72" width="300" height="6" rx="2" fill="#c4a882" opacity=".4"/>
+        <!-- Rang vigne central -->
+        <rect x="130" y="10" width="40" height="62" rx="5" fill="#4a7c3f" opacity=".6"/>
+        <ellipse cx="150" cy="12" rx="22" ry="14" fill="#5a9a4a" opacity=".6"/>
+        <ellipse cx="148" cy="35" rx="18" ry="12" fill="#4a8a38" opacity=".5"/>
+        <ellipse cx="152" cy="55" rx="16" ry="10" fill="#5a9a4a" opacity=".5"/>
+        <!-- Structure enjambeuse (portique) -->
+        <rect x="60" y="18" width="12" height="54" rx="4" fill="#c8621a"/>
+        <rect x="228" y="18" width="12" height="54" rx="4" fill="#c8621a"/>
+        <rect x="60" y="18" width="180" height="12" rx="4" fill="#c8621a"/>
+        <!-- Rampes sous le portique -->
+        <rect x="72" y="58" width="60" height="7" rx="3" fill="#d4721a"/>
+        <rect x="168" y="58" width="60" height="7" rx="3" fill="#d4721a"/>
+        <!-- Buses -->
+        <circle cx="82" cy="61" r="5" fill="#e87040"/>
+        <circle cx="100" cy="61" r="5" fill="#e87040"/>
+        <circle cx="118" cy="61" r="5" fill="#e87040"/>
+        <circle cx="182" cy="61" r="5" fill="#e87040"/>
+        <circle cx="200" cy="61" r="5" fill="#e87040"/>
+        <circle cx="218" cy="61" r="5" fill="#e87040"/>
+        <!-- Jets -->
+        <line x1="82" y1="66" x2="78" y2="76" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <line x1="82" y1="66" x2="82" y2="77" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <line x1="100" y1="66" x2="100" y2="77" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <line x1="118" y1="66" x2="118" y2="77" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <line x1="182" y1="66" x2="182" y2="77" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <line x1="200" y1="66" x2="200" y2="77" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <line x1="218" y1="66" x2="218" y2="77" stroke="#c8621a" stroke-width="1.5" stroke-dasharray="2,2"/>
+        <!-- Roues tracteur (à gauche et droite de l'enjambeuse) -->
+        <circle cx="42" cy="70" r="12" fill="#2a2a2a"/>
+        <circle cx="258" cy="70" r="12" fill="#2a2a2a"/>
+      </svg>
+      <div class="herb-appareil-name">Enjambeuse double rampe</div>
+      <div class="herb-appareil-desc">Enjambe le rang. Deux rampes (gauche + droite) traitent simultanément les deux côtés. Style Dhugues Intercep, Boisselet.</div>
+      <div>
+        <span class="herb-tag">Double rampe</span>
+        <span class="herb-tag">1 rang/passage</span>
+        <span class="herb-tag">Précision ++</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PARAMÈTRES HERBICIDES -->
+  <div class="section-title" style="margin-bottom:12px">Paramètres de réglage</div>
+  <div class="herb-grid">
+
+    <!-- BUSES HERBICIDES -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-orange">🔩</div><div>
+          <div class="card-num">01 — Buses</div>
+          <div class="card-title">Type de buses herbicide</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge1">—</div>
+      </div>
+      <label class="field-label">Type de buse</label>
+      <select id="h_buse_type" onchange="evalHerb()">
+        <option value="">— sélectionner —</option>
+        <option value="fente-bp">Fente plate basse pression (1–3 bar)</option>
+        <option value="miroir">Miroir / double jet (couverture sol ++)</option>
+        <option value="ai">Injection d'air anti-dérive (ZNT)</option>
+        <option value="turbulence">Turbulence (déconseillé herbicides)</option>
+      </select>
+      <div class="mt10">
+        <label class="field-label">Calibre ISO</label>
+        <select id="h_calibre" onchange="evalHerb()">
+          <option value="">— sélectionner —</option>
+          <option value="02">02 — Jaune — 0.80 L/min à 3 bar</option>
+          <option value="025">025 — Lilas — 1.00 L/min à 3 bar</option>
+          <option value="03">03 — Bleu — 1.20 L/min à 3 bar</option>
+          <option value="04">04 — Rouge — 1.60 L/min à 3 bar</option>
+          <option value="05">05 — Marron — 2.00 L/min à 3 bar</option>
+        </select>
+      </div>
+      <div class="mt10">
+        <label class="field-label">État des buses</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="h_usure" data-val="ok" onclick="toggleBtn(this)">✓ &lt; 10%</button>
+          <button class="tog warn" data-group="h_usure" data-val="warn" onclick="toggleBtn(this)">⚠ 10–20%</button>
+          <button class="tog bad" data-group="h_usure" data-val="bad" onclick="toggleBtn(this)">✗ &gt; 20%</button>
+        </div>
+      </div>
+      <div class="herb-alert" id="halert1">⚠ Buses à turbulence déconseillées en herbicide — risque de dérive sur la végétation</div>
+    </div>
+
+    <!-- PRESSION -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-orange">📊</div><div>
+          <div class="card-num">02 — Pression</div>
+          <div class="card-title">Pression de travail</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge2">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Pression (bar)</label>
+        <div class="range-val" id="h_pression_val">2.0 bar</div>
+      </div>
+      <input type="range" id="h_pression" min="0.5" max="6" step="0.5" value="2" oninput="syncRange('h_pression','h_pression_val','bar',1);calcHerbVol()">
+      <div class="gauge-track"><div class="gauge-fill" id="h_pression_gauge" style="width:25%"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;padding:6px 10px;background:var(--orange-pale);border-radius:8px;">
+        💡 Herbicides viti : travailler à <b>1–3 bar</b> pour grosses gouttes et réduire la dérive sur la végétation.
+      </div>
+      <div class="herb-alert" id="halert2">⚠ Pression trop élevée — risque de dérive sur feuillage et grappes</div>
+    </div>
+
+    <!-- VITESSE -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-green">🚜</div><div>
+          <div class="card-num">03 — Vitesse</div>
+          <div class="card-title">Vitesse d'avancement</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge3">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Vitesse (km/h)</label>
+        <div class="range-val" id="h_vitesse_val">5.0 km/h</div>
+      </div>
+      <input type="range" id="h_vitesse" min="2" max="10" step="0.5" value="5" oninput="syncRange('h_vitesse','h_vitesse_val','km/h',1);calcHerbVol()">
+      <div class="gauge-track"><div class="gauge-fill" id="h_vitesse_gauge"></div></div>
+      <div class="herb-alert" id="halert3">⚠ Vitesse trop élevée — réduire à 4–6 km/h pour herbicides</div>
+    </div>
+
+    <!-- VOLUME/HA -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-blue">💧</div><div>
+          <div class="card-num">04 — Dose</div>
+          <div class="card-title">Volume / ha</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge4">—</div>
+      </div>
+      <div class="range-row">
+        <label class="field-label" style="margin:0">Débit buse (L/min)</label>
+        <div class="range-val" id="h_debit_val">0.80 L/min</div>
+      </div>
+      <input type="range" id="h_debit" min="0.2" max="3" step="0.05" value="0.8" oninput="syncRange('h_debit','h_debit_val','L/min',2);calcHerbVol()">
+      <div class="mt10">
+        <label class="field-label">Nb de buses actives</label>
+        <select id="h_nb_buses" onchange="calcHerbVol()">
+          <option value="2">2 buses</option>
+          <option value="4" selected>4 buses</option>
+          <option value="6">6 buses</option>
+          <option value="8">8 buses</option>
+        </select>
+      </div>
+      <div class="mt10">
+        <label class="field-label">Largeur traitée (m)</label>
+        <div class="range-row" style="margin-bottom:2px">
+          <label class="field-label" style="margin:0"></label>
+          <div class="range-val" id="h_largeur_val">1.5 m</div>
+        </div>
+        <input type="range" id="h_largeur" min="0.5" max="4" step="0.1" value="1.5" oninput="syncRange('h_largeur','h_largeur_val','m',1);calcHerbVol()">
+      </div>
+      <div class="herb-result-box" id="h_vol_box">
+        <div><div class="result-label">Volume calculé</div><div class="result-note">débit×buses×600÷largeur÷vitesse</div></div>
+        <div style="display:flex;align-items:baseline;gap:3px">
+          <div class="herb-result-num" id="h_volumeha_val">—</div>
+          <div class="result-unit">L/ha</div>
+        </div>
+      </div>
+      <div class="herb-alert" id="halert4">⚠ Volume hors cible — herbicides viti : cible 80–150 L/ha</div>
+    </div>
+
+    <!-- CACHE ANTI-DÉRIVE -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-brown">🛡️</div><div>
+          <div class="card-num">05 — Protection</div>
+          <div class="card-title">Cache anti-dérive</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge5">—</div>
+      </div>
+      <label class="field-label">Cache présent</label>
+      <div class="toggle-group">
+        <button class="tog ok active" data-group="h_cache" data-val="ok" onclick="toggleBtn(this)">✓ Oui</button>
+        <button class="tog bad" data-group="h_cache" data-val="bad" onclick="toggleBtn(this)">✗ Non</button>
+      </div>
+      <div class="mt10">
+        <label class="field-label">État du cache</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="h_cache_etat" data-val="ok" onclick="toggleBtn(this)">✓ Bon état</button>
+          <button class="tog warn" data-group="h_cache_etat" data-val="warn" onclick="toggleBtn(this)">⚠ Abîmé</button>
+          <button class="tog bad" data-group="h_cache_etat" data-val="bad" onclick="toggleBtn(this)">✗ Manquant</button>
+        </div>
+      </div>
+      <div class="mt10">
+        <label class="field-label">Distance buses / sol (cm)</label>
+        <div class="range-row" style="margin-bottom:2px">
+          <label></label>
+          <div class="range-val" id="h_hauteur_val">20 cm</div>
+        </div>
+        <input type="range" id="h_hauteur" min="5" max="50" step="1" value="20" oninput="syncRange('h_hauteur','h_hauteur_val','cm',0);evalHerb()">
+      </div>
+      <div class="herb-alert" id="halert5">⚠ Cache absent — risque de dérive sur végétation et grappes</div>
+    </div>
+
+    <!-- STADE VIGNE -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-green">🍃</div><div>
+          <div class="card-num">06 — Stade</div>
+          <div class="card-title">Stade vigne & risque</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge6">—</div>
+      </div>
+      <label class="field-label">Stade phénologique</label>
+      <select id="h_stade" onchange="evalHerb()">
+        <option value="">— sélectionner —</option>
+        <option value="dormance">Dormance / hiver — risque minimal</option>
+        <option value="debourrement">Débourrement — risque modéré</option>
+        <option value="feuillaison">Feuillaison (2–4 feuilles) — risque élevé</option>
+        <option value="vegetation">Pleine végétation — risque très élevé</option>
+      </select>
+      <div class="mt10">
+        <label class="field-label">Produit herbicide</label>
+        <select id="h_produit" onchange="evalHerb()">
+          <option value="">— sélectionner —</option>
+          <option value="total">Total (glyphosate) — systémique</option>
+          <option value="contact">Contact (acide pélargonique…) — contact</option>
+          <option value="residuel">Résiduel (sol) — pré-levée</option>
+        </select>
+      </div>
+      <div class="herb-alert" id="halert6">🛑 Stade végétatif avancé — risque de phytotoxicité élevé sur feuilles et grappes</div>
+    </div>
+
+    <!-- ZNT -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-blue">📏</div><div>
+          <div class="card-num">07 — ZNT</div>
+          <div class="card-title">Zone Non Traitée</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge7">—</div>
+      </div>
+      <label class="field-label">Proximité cours d'eau / fossé</label>
+      <div class="toggle-group">
+        <button class="tog ok active" data-group="h_znt" data-val="ok" onclick="toggleBtn(this)">Aucun à proximité</button>
+        <button class="tog warn" data-group="h_znt" data-val="warn" onclick="toggleBtn(this)">⚠ Fossé &gt; 5 m</button>
+        <button class="tog bad" data-group="h_znt" data-val="bad" onclick="toggleBtn(this)">🛑 Cours d'eau proche</button>
+      </div>
+      <div class="mt10">
+        <label class="field-label">Buses homologuées ZNT</label>
+        <div class="toggle-group">
+          <button class="tog ok active" data-group="h_znt_buse" data-val="ok" onclick="toggleBtn(this)">✓ Oui</button>
+          <button class="tog bad" data-group="h_znt_buse" data-val="bad" onclick="toggleBtn(this)">✗ Non</button>
+        </div>
+      </div>
+      <div class="herb-alert" id="halert7">🛑 Zone sensible — utiliser uniquement des buses homologuées ZNT et respecter les distances réglementaires</div>
+    </div>
+
+    <!-- MÉTÉO HERBICIDES -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-icon-wrap"><div class="card-icon ic-blue">🌤</div><div>
+          <div class="card-num">08 — Météo</div>
+          <div class="card-title">Conditions météo</div>
+        </div></div>
+        <div class="status-pill pill-na" id="hbadge8">—</div>
+      </div>
+      <div class="meteo-grid">
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌬 Vent</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input type="number" id="h_vent" min="0" max="40" value="5" oninput="evalHerb()">
+            <span class="meteo-unit">km/h</span>
+          </div>
+        </div>
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌡 Temp. air</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input type="number" id="h_temp" min="0" max="40" value="18" oninput="evalHerb()">
+            <span class="meteo-unit">°C</span>
+          </div>
+        </div>
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌡 Temp. sol</div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <input type="number" id="h_temp_sol" min="0" max="35" value="12" oninput="evalHerb()">
+            <span class="meteo-unit">°C</span>
+          </div>
+        </div>
+        <div class="meteo-cell">
+          <div class="meteo-cell-label">🌧 Pluie</div>
+          <select id="h_pluie" onchange="evalHerb()" style="font-size:12px;margin-top:4px">
+            <option value="ok">Non</option>
+            <option value="warn">Prévu &lt;4h</option>
+            <option value="bad">Récente &lt;24h</option>
+          </select>
+        </div>
+      </div>
+      <div class="herb-alert" id="halert8"></div>
+    </div>
+
+  </div><!-- fin herb-grid -->
+
+  <div class="nav-row">
+    <button class="btn btn-ghost" onclick="resetHerb()">↺ Réinitialiser</button>
+    <button class="btn btn-main" onclick="exportHerb()">⬇ Exporter</button>
+  </div>
+
+</div><!-- fin module-herb -->
+
+<script>
+// ── SWITCH MODULE ──
+function switchModule(m){
+  document.querySelectorAll('.main-module').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(el=>el.className='main-tab inactive');
+  document.getElementById('module-'+m).classList.add('active');
+  document.getElementById('mt-'+m).className='main-tab active';
+  window.scrollTo(0,0);
+}
+
+// ── HERBICIDES ──
+const hstate = {h_usure:'ok',h_cache:'ok',h_cache_etat:'ok',h_znt:'ok',h_znt_buse:'ok'};
+let selectedHerbApp = null;
+
+function selectHerbAppareil(card,id,name){
+  document.querySelectorAll('.herb-card-appareil').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedHerbApp={id,name};
+  evalHerb();
+}
+
+function calcHerbVol(){
+  const debit=+document.getElementById('h_debit').value;
+  const nb=+document.getElementById('h_nb_buses').value;
+  const vit=+document.getElementById('h_vitesse').value;
+  const larg=+document.getElementById('h_largeur').value;
+  if(vit>0&&larg>0){
+    const vol=Math.round((debit*nb*600)/(larg*vit));
+    document.getElementById('h_volumeha_val').textContent=vol;
+    const box=document.getElementById('h_vol_box');
+    const num=document.querySelector('#h_vol_box .herb-result-num');
+    if(vol<60||vol>200){box.style.background='var(--red-pale)';num.style.color='var(--red)';}
+    else if(vol<80||vol>150){box.style.background='var(--yellow-pale)';num.style.color='var(--yellow)';}
+    else{box.style.background='var(--orange-pale)';num.style.color='var(--orange)';}
+  }
+  evalHerb();
+}
+
+function evalHerb(){
+  const scores=[];
+
+  // 1 buses
+  const bt=document.getElementById('h_buse_type').value;
+  let s1=bt?(bt==='turbulence'?0.2:1):0;
+  if(hstate.h_usure==='warn')s1=Math.min(s1,0.6);
+  if(hstate.h_usure==='bad')s1=Math.min(s1,0.2);
+  scores.push(s1);
+  setHBadge(1,s1);
+  const a1=document.getElementById('halert1');
+  bt==='turbulence'?a1.classList.add('visible'):a1.classList.remove('visible');
+
+  // 2 pression
+  const p=+document.getElementById('h_pression').value;
+  const ok2=p>=1&&p<=3,warn2=p>3&&p<=4;
+  const g2=document.getElementById('h_pression_gauge');
+  g2.style.width=((p-0.5)/5.5*100)+'%';
+  g2.style.background=ok2?'var(--green)':warn2?'var(--yellow)':'var(--red)';
+  const s2=ok2?1:warn2?0.5:0.2;
+  scores.push(s2);setHBadge(2,s2);
+  const a2=document.getElementById('halert2');
+  p>3?a2.classList.add('visible'):a2.classList.remove('visible');
+
+  // 3 vitesse
+  const v=+document.getElementById('h_vitesse').value;
+  const ok3=v>=4&&v<=7;
+  const g3=document.getElementById('h_vitesse_gauge');
+  g3.style.width=((v-2)/8*100)+'%';
+  g3.style.background=ok3?'var(--green)':v<4?'var(--yellow)':'var(--red)';
+  const s3=ok3?1:0.4;
+  scores.push(s3);setHBadge(3,s3);
+  const a3=document.getElementById('halert3');
+  v>7?a3.classList.add('visible'):a3.classList.remove('visible');
+
+  // 4 volume
+  const debit=+document.getElementById('h_debit').value;
+  const nb=+document.getElementById('h_nb_buses').value;
+  const larg=+document.getElementById('h_largeur').value;
+  const vol=(debit*nb*600)/(larg*v);
+  const ok4=vol>=80&&vol<=150,warn4=(vol>=60&&vol<80)||(vol>150&&vol<=200);
+  const s4=ok4?1:warn4?0.6:0.2;
+  scores.push(s4);setHBadge(4,s4);
+  const a4=document.getElementById('halert4');
+  (!ok4&&!warn4)?a4.classList.add('visible'):a4.classList.remove('visible');
+
+  // 5 cache
+  let s5=1;
+  if(hstate.h_cache==='bad')s5=0.1;
+  if(hstate.h_cache_etat==='warn')s5=Math.min(s5,0.6);
+  if(hstate.h_cache_etat==='bad')s5=Math.min(s5,0.2);
+  const haut=+document.getElementById('h_hauteur').value;
+  if(haut>30)s5=Math.min(s5,0.5);
+  scores.push(s5);setHBadge(5,s5);
+  const a5=document.getElementById('halert5');
+  hstate.h_cache==='bad'?a5.classList.add('visible'):a5.classList.remove('visible');
+
+  // 6 stade
+  const stade=document.getElementById('h_stade').value;
+  const produit=document.getElementById('h_produit').value;
+  let s6=!stade?0:stade==='dormance'?1:stade==='debourrement'?0.7:stade==='feuillaison'?0.4:0.1;
+  scores.push(s6);setHBadge(6,s6);
+  const a6=document.getElementById('halert6');
+  (stade==='feuillaison'||stade==='vegetation')?a6.classList.add('visible'):a6.classList.remove('visible');
+
+  // 7 ZNT
+  let s7=1;
+  if(hstate.h_znt==='warn')s7=0.6;
+  if(hstate.h_znt==='bad')s7=0;
+  if(hstate.h_znt_buse==='bad')s7=Math.min(s7,0.3);
+  scores.push(s7);setHBadge(7,s7);
+  const a7=document.getElementById('halert7');
+  (hstate.h_znt==='bad'||hstate.h_znt_buse==='bad')?a7.classList.add('visible'):a7.classList.remove('visible');
+
+  // 8 météo
+  const vent=+document.getElementById('h_vent').value||0;
+  const temp=+document.getElementById('h_temp').value||18;
+  const tempSol=+document.getElementById('h_temp_sol').value||12;
+  const pluie=document.getElementById('h_pluie').value;
+  let s8=1,msg='';
+  if(vent>10){s8=0;msg='🛑 Vent > 10 km/h — traitement herbicide interdit';}
+  else if(vent>6){s8=Math.min(s8,0.3);msg+='⚠ Vent > 6 km/h — risque de dérive important
+';}
+  if(temp>28){s8=Math.min(s8,0.4);msg+='⚠ Température > 28°C — évaporation rapide, efficacité réduite
+';}
+  if(tempSol<8){s8=Math.min(s8,0.4);msg+='⚠ Sol froid (< 8°C) — efficacité herbicides réduite
+';}
+  if(pluie==='bad'){s8=0;msg+='🛑 Pluie récente — lessivage du produit, traitement à reporter';}
+  else if(pluie==='warn'){s8=Math.min(s8,0.3);msg+='⚠ Pluie prévue — risque de lessivage';}
+  scores.push(s8);setHBadge(8,s8);
+  const a8=document.getElementById('halert8');
+  if(msg){a8.textContent=msg.trim();a8.classList.add('visible');}else a8.classList.remove('visible');
+
+  // SCORE GLOBAL
+  const avg=scores.reduce((a,b)=>a+b,0)/scores.length;
+  const pct=Math.round(avg*100);
+  const circ=220;
+  document.getElementById('hCircFill').style.strokeDashoffset=circ-(circ*avg);
+  document.getElementById('hScorePct').textContent=pct+'%';
+  const bd=document.getElementById('hScoreBadge'),fill=document.getElementById('hCircFill');
+  if(pct>=80){
+    fill.style.stroke='var(--green)';bd.textContent='✓ Prêt';bd.className='score-badge badge-ready';
+    document.getElementById('hScoreDesc').textContent='Conditions favorables pour le traitement herbicide.';
+  }else if(pct>=55){
+    fill.style.stroke='var(--yellow)';bd.textContent='⚠ À revoir';bd.className='score-badge badge-warn-g';
+    document.getElementById('hScoreDesc').textContent=scores.filter(s=>s<0.5).length+' point(s) à corriger avant traitement.';
+  }else{
+    fill.style.stroke='var(--red)';bd.textContent='✗ Non conforme';bd.className='score-badge badge-nok-g';
+    document.getElementById('hScoreDesc').textContent='Conditions non favorables — ne pas traiter.';
+  }
+}
+
+function setHBadge(n,s){
+  const p=document.getElementById('hbadge'+n);
+  if(s>=0.85){p.textContent='✓ OK';p.className='status-pill pill-ok';}
+  else if(s>=0.5){p.textContent='⚠';p.className='status-pill pill-warn';}
+  else{p.textContent='✗';p.className='status-pill pill-bad';}
+}
+
+function resetHerb(){
+  document.querySelectorAll('[data-group^="h_"]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[data-group^="h_"][data-val="ok"]').forEach(b=>b.classList.add('active'));
+  Object.keys(hstate).forEach(k=>hstate[k]='ok');
+  document.getElementById('h_pression').value=2;
+  document.getElementById('h_vitesse').value=5;
+  document.getElementById('h_debit').value=0.8;
+  document.getElementById('h_hauteur').value=20;
+  document.getElementById('h_vent').value=5;
+  document.getElementById('h_temp').value=18;
+  document.getElementById('h_temp_sol').value=12;
+  document.getElementById('h_pluie').value='ok';
+  document.getElementById('h_buse_type').value='';
+  document.getElementById('h_calibre').value='';
+  document.getElementById('h_stade').value='';
+  document.getElementById('h_produit').value='';
+  document.getElementById('h_nb_buses').value='4';
+  document.getElementById('h_largeur').value=1.5;
+  syncRange('h_pression','h_pression_val','bar',1);
+  syncRange('h_vitesse','h_vitesse_val','km/h',1);
+  syncRange('h_debit','h_debit_val','L/min',2);
+  syncRange('h_hauteur','h_hauteur_val','cm',0);
+  syncRange('h_largeur','h_largeur_val','m',1);
+  evalHerb();
+}
+
+function exportHerb(){
+  const now=new Date().toLocaleString('fr-FR');
+  const pct=document.getElementById('hScorePct').textContent;
+  const status=document.getElementById('hScoreBadge').textContent;
+  let txt='RÉGLAGE PULVÉ — RAPPORT HERBICIDES
+'+'═'.repeat(40)+'
+Date : '+now+'
+';
+  if(selectedHerbApp) txt+='Appareil : '+selectedHerbApp.name+'
+';
+  txt+='Score : '+pct+' — '+status+'
+
+';
+  txt+='Buse      : '+document.getElementById('h_buse_type').value+'
+';
+  txt+='Calibre   : '+document.getElementById('h_calibre').value+'
+';
+  txt+='Pression  : '+document.getElementById('h_pression_val').textContent+'
+';
+  txt+='Vitesse   : '+document.getElementById('h_vitesse_val').textContent+'
+';
+  txt+='Volume/ha : '+document.getElementById('h_volumeha_val').textContent+' L/ha
+';
+  txt+='Stade     : '+document.getElementById('h_stade').value+'
+';
+  txt+='Produit   : '+document.getElementById('h_produit').value+'
+';
+  txt+='Vent      : '+document.getElementById('h_vent').value+' km/h
+';
+  txt+='Temp air  : '+document.getElementById('h_temp').value+' °C
+';
+  txt+='Temp sol  : '+document.getElementById('h_temp_sol').value+' °C
+';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'}));
+  a.download='herbicides-rapport-'+new Date().toISOString().slice(0,10)+'.txt';
   a.click();
 }
 </script>
